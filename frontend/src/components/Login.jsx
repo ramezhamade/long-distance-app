@@ -42,7 +42,7 @@ function Login({ onLogin }) {
   return (
     <div className="login-container">
       <div className="login-card">
-        <h1 className="login-title">💕 Our Long Distance Love 💕</h1>
+        <h1 className="login-title">🎮 The Lamez Hub 🎮</h1>
         <p className="login-subtitle">Sign in to continue</p>
 
         <form className="login-form" onSubmit={handleSubmit}>

@@ -4,6 +4,11 @@ import Calendar from './components/Calendar';
 import Countdown from './components/Countdown';
 import Statistics from './components/Statistics';
 import Login from './components/Login';
+import PlayerSelector from './components/PlayerSelector';
+import TabNavigation from './components/TabNavigation';
+import GamesHub from './components/games/GamesHub';
+import WhoMoreLikely from './components/whoMoreLikely/WhoMoreLikely';
+import Scoreboard from './components/scoreboard/Scoreboard';
 import './App.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -14,13 +19,21 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authToken, setAuthToken] = useState(null);
+  const [playerName, setPlayerName] = useState(null);
+  const [showPlayerSelector, setShowPlayerSelector] = useState(false);
+  const [activeTab, setActiveTab] = useState('home');
 
   useEffect(() => {
     // Check if already logged in
     const savedAuth = localStorage.getItem('auth');
+    const savedPlayer = localStorage.getItem('playerName');
+
     if (savedAuth) {
       setAuthToken(savedAuth);
       setIsAuthenticated(true);
+      if (savedPlayer) {
+        setPlayerName(savedPlayer);
+      }
     } else {
       setLoading(false);
     }
@@ -33,19 +46,38 @@ function App() {
     }
   }, [isAuthenticated, authToken]);
 
-  const getAuthHeaders = () => ({
-    Authorization: `Basic ${authToken}`,
-  });
+  const getAuthHeaders = () => {
+    const headers = {
+      Authorization: `Basic ${authToken}`,
+    };
+    if (playerName) {
+      headers['X-Player-Name'] = playerName;
+    }
+    return headers;
+  };
 
   const handleLogin = (credentials) => {
     setAuthToken(credentials);
     setIsAuthenticated(true);
+
+    // Check if player is already selected
+    const savedPlayer = localStorage.getItem('playerName');
+    if (!savedPlayer) {
+      setShowPlayerSelector(true);
+    }
+  };
+
+  const handlePlayerSelect = (player) => {
+    setPlayerName(player);
+    setShowPlayerSelector(false);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('auth');
+    localStorage.removeItem('playerName');
     setIsAuthenticated(false);
     setAuthToken(null);
+    setPlayerName(null);
     setEvents([]);
     setStatistics(null);
   };
@@ -136,18 +168,46 @@ function App() {
 
   return (
     <div className="app">
+      {showPlayerSelector && (
+        <PlayerSelector
+          onSelectPlayer={handlePlayerSelect}
+          onClose={() => setShowPlayerSelector(false)}
+        />
+      )}
+
       <header className="app-header">
-        <h1>💕 Our Long Distance Love 💕</h1>
-        <p>Together, no matter the distance</p>
-        <button onClick={handleLogout} className="logout-button">
-          Logout
-        </button>
+        <h1>🎮 The Lamez Hub 🎮</h1>
+        <p>Where Ramez & Layan connect across the miles</p>
+        <div className="header-actions">
+          {playerName && <span className="current-player">Playing as: {playerName}</span>}
+          <button onClick={handleLogout} className="logout-button">
+            Logout
+          </button>
+        </div>
       </header>
 
+      <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+
       <div className="container">
-        <Countdown event={nextEvent} />
-        <Statistics statistics={statistics} onUpdateStatistics={updateStatistics} />
-        <Calendar events={events} onAddEvent={addEvent} onDeleteEvent={deleteEvent} />
+        {activeTab === 'home' && (
+          <>
+            <Countdown event={nextEvent} />
+            <Statistics statistics={statistics} onUpdateStatistics={updateStatistics} />
+            <Calendar events={events} onAddEvent={addEvent} onDeleteEvent={deleteEvent} />
+          </>
+        )}
+
+        {activeTab === 'games' && (
+          <GamesHub getAuthHeaders={getAuthHeaders} />
+        )}
+
+        {activeTab === 'whoMoreLikely' && (
+          <WhoMoreLikely getAuthHeaders={getAuthHeaders} playerName={playerName} />
+        )}
+
+        {activeTab === 'stats' && (
+          <Scoreboard getAuthHeaders={getAuthHeaders} />
+        )}
       </div>
     </div>
   );

@@ -606,3 +606,520 @@
     position: relative;
   }
 }
+
+/* Player Selector Modal */
+.player-selector {
+  max-width: 400px;
+}
+
+.player-selector h2 {
+  color: #667eea;
+  margin-bottom: 0.5rem;
+}
+
+.player-selector p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.player-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.player-button {
+  flex: 1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  padding: 2rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.player-button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+.player-emoji {
+  font-size: 3rem;
+}
+
+.player-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem;
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+}
+
+.tab-button {
+  flex: 1;
+  background: transparent;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.tab-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tab-button.active {
+  background: white;
+  color: #667eea;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.tab-icon {
+  font-size: 1.5rem;
+}
+
+.tab-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Header Actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.current-player {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Game Sections */
+.games-section,
+.who-more-likely-section,
+.scoreboard-section {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.games-section h2,
+.who-more-likely-section h2,
+.scoreboard-section h2 {
+  color: #667eea;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .tab-navigation {
+    gap: 0.25rem;
+    padding: 0.25rem;
+  }
+
+  .tab-button {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .tab-label {
+    font-size: 0.75rem;
+  }
+
+  .tab-icon {
+    font-size: 1.2rem;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .logout-button {
+    position: static;
+    margin: 0;
+  }
+
+  .player-buttons {
+    flex-direction: column;
+  }
+}
+
+/* ============ GAME COMPONENTS ============ */
+
+/* Games Hub */
+.games-hub {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.games-subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.game-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.game-card {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.game-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.back-button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-bottom: 2rem;
+}
+
+/* Wordle */
+.wordle-game {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.wordle-board {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 2rem 0;
+}
+
+.wordle-row {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
+.wordle-cell {
+  width: 60px;
+  height: 60px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.wordle-input {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.wordle-input input {
+  padding: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.wordle-input button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Connections */
+.connections-game {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.mistakes-counter {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.mistake-dot {
+  margin-left: 5px;
+  color: #ddd;
+}
+
+.mistake-dot.filled {
+  color: #e74c3c;
+}
+
+.solved-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.solved-group {
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.solved-group.difficulty-easy {
+  background: #f9e79f;
+}
+
+.solved-group.difficulty-medium {
+  background: #aed6f1;
+}
+
+.solved-group.difficulty-hard {
+  background: #d7bde2;
+}
+
+.connections-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.connection-word {
+  background: #f8f9fa;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  padding: 1.5rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.connection-word.selected {
+  background: #667eea;
+  color: white;
+}
+
+.connections-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.connections-actions button {
+  background: white;
+  border: 2px solid #667eea;
+  color: #667eea;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  border: none !important;
+}
+
+/* Who's More Likely */
+.who-more-likely {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.question-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  text-align: center;
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.category-badge.raunchy { background: #e74c3c; color: white; }
+.category-badge.funny { background: #f39c12; color: white; }
+.category-badge.roasty { background: #9b59b6; color: white; }
+.category-badge.sweet { background: #e91e63; color: white; }
+
+.question-text {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.answer-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.answer-btn {
+  flex: 1;
+  padding: 1.5rem 2rem;
+  border: none;
+  border-radius: 15px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: white;
+}
+
+.answer-btn.player1 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.answer-btn.player2 {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.result-message {
+  padding: 1.5rem;
+  border-radius: 15px;
+  margin: 1.5rem 0;
+}
+
+.result-message.agree { background: #d4edda; }
+.result-message.disagree { background: #fff3cd; }
+
+.next-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+/* Scoreboard */
+.scoreboard {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.overall-stats, .game-stats {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.player-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.player-stat-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 15px;
+  text-align: center;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-around;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.stat-value.wins { color: #4ade80; }
+.stat-value.losses { color: #f87171; }
+.stat-value.ties { color: #fbbf24; }
+
+.game-result {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 15px;
+}
+
+.winner-banner {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 15px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.winner-banner.tie {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+}
+
+.waiting {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.game-loading {
+  text-align: center;
+  padding: 3rem;
+}
