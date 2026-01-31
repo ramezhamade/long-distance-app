@@ -341,6 +341,23 @@ app.get('/api/who-more-likely/next', authenticate, (req, res) => {
   const data = readData();
   const playerName = getPlayerName(req);
 
+  // Initialize questions if empty
+  if (!data.whoMoreLikely.questions || data.whoMoreLikely.questions.length === 0) {
+    const allQuestions = [];
+    Object.keys(whoMoreLikelyQuestions).forEach(category => {
+      whoMoreLikelyQuestions[category].forEach(text => {
+        allQuestions.push({
+          id: `wml_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          text,
+          category,
+          createdAt: new Date().toISOString()
+        });
+      });
+    });
+    data.whoMoreLikely.questions = allQuestions;
+    writeData(data);
+  }
+
   // Find a question that this player hasn't answered
   const unanswered = data.whoMoreLikely.questions.find(q => {
     const responses = data.whoMoreLikely.responses[q.id];
