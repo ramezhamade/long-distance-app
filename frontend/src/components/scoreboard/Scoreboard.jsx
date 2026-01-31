@@ -6,6 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 function Scoreboard({ getAuthHeaders }) {
   const [loading, setLoading] = useState(true);
   const [scoreboard, setScoreboard] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchScoreboard();
@@ -13,12 +14,16 @@ function Scoreboard({ getAuthHeaders }) {
 
   const fetchScoreboard = async () => {
     try {
+      console.log('Fetching scoreboard from:', `${API_URL}/scoreboard`);
       const response = await axios.get(`${API_URL}/scoreboard`, {
         headers: getAuthHeaders(),
       });
+      console.log('Scoreboard data:', response.data);
       setScoreboard(response.data);
+      setError(null);
     } catch (error) {
       console.error('Error fetching scoreboard:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -28,8 +33,14 @@ function Scoreboard({ getAuthHeaders }) {
     return <div className="game-loading">Loading stats...</div>;
   }
 
-  if (!scoreboard) {
-    return <div className="game-error">Error loading scoreboard</div>;
+  if (error || !scoreboard) {
+    return (
+      <div className="game-error">
+        <p>Error loading scoreboard</p>
+        <button onClick={fetchScoreboard} className="retry-btn">Retry</button>
+        {error && <p style={{fontSize: '0.8rem', marginTop: '1rem'}}>Error: {error}</p>}
+      </div>
+    );
   }
 
   const { overall, byGame } = scoreboard;

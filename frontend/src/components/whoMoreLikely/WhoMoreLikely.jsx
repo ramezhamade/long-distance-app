@@ -10,17 +10,23 @@ function WhoMoreLikely({ getAuthHeaders, playerName }) {
   const [opponentAnswer, setOpponentAnswer] = useState(null);
   const [bothAnswered, setBothAnswered] = useState(false);
   const [allAnswered, setAllAnswered] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchNextQuestion();
-  }, []);
+    if (playerName) {
+      fetchNextQuestion();
+    }
+  }, [playerName]);
 
   const fetchNextQuestion = async () => {
     setLoading(true);
+    setError(null);
     try {
+      console.log('Fetching question from:', `${API_URL}/who-more-likely/next`);
       const response = await axios.get(`${API_URL}/who-more-likely/next`, {
         headers: getAuthHeaders(),
       });
+      console.log('Question data:', response.data);
 
       if (response.data.allAnswered) {
         setAllAnswered(true);
@@ -32,6 +38,7 @@ function WhoMoreLikely({ getAuthHeaders, playerName }) {
       }
     } catch (error) {
       console.error('Error fetching question:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -62,6 +69,16 @@ function WhoMoreLikely({ getAuthHeaders, playerName }) {
     return <div className="game-loading">Loading...</div>;
   }
 
+  if (error) {
+    return (
+      <div className="game-error">
+        <p>Error loading questions</p>
+        <button onClick={fetchNextQuestion} className="retry-btn">Retry</button>
+        <p style={{fontSize: '0.8rem', marginTop: '1rem'}}>Error: {error}</p>
+      </div>
+    );
+  }
+
   if (allAnswered) {
     return (
       <div className="who-more-likely">
@@ -76,6 +93,10 @@ function WhoMoreLikely({ getAuthHeaders, playerName }) {
 
   if (!currentQuestion) {
     return <div className="game-loading">Loading question...</div>;
+  }
+
+  if (!playerName) {
+    return <div className="game-error">Please select a player first</div>;
   }
 
   const otherPlayer = playerName === 'Ramez' ? 'Layan' : 'Ramez';
