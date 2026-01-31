@@ -1,0 +1,32 @@
+{
+  "name": "long-distance-mobile",
+  "version": "1.0.0",
+  "description": "Long Distance Love - iOS App",
+  "main": "index.js",
+  "scripts": {
+    "start": "react-native start",
+    "ios": "react-native run-ios",
+    "android": "react-native run-android",
+    "test": "jest"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-native": "0.73.2",
+    "axios": "^1.6.0",
+    "@react-native-async-storage/async-storage": "^1.21.0",
+    "react-native-linear-gradient": "^2.8.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.20.0",
+    "@babel/runtime": "^7.20.0",
+    "@react-native/eslint-config": "^0.73.1",
+    "@react-native/metro-config": "^0.73.3",
+    "@react-native/typescript-config": "^0.73.1",
+    "babel-jest": "^29.6.3",
+    "metro-react-native-babel-preset": "0.77.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
