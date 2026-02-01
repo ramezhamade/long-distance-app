@@ -44,7 +44,12 @@ function WordleGame({ getAuthHeaders }) {
       setWinner(response.data.winner);
     } catch (error) {
       console.error('Error fetching puzzle:', error);
-      setGameState('error');
+      if (error.response?.status === 400 && error.response?.data?.message) {
+        setMessage(error.response.data.message);
+        setGameState('no_more_puzzles');
+      } else {
+        setGameState('error');
+      }
     }
   };
 
@@ -137,6 +142,15 @@ function WordleGame({ getAuthHeaders }) {
 
   if (gameState === 'error') {
     return <div className="game-error">Error loading puzzle. Please try again.</div>;
+  }
+
+  if (gameState === 'no_more_puzzles') {
+    return (
+      <div className="game-complete">
+        <h2>🎉 Congratulations!</h2>
+        <p>{message}</p>
+      </div>
+    );
   }
 
   return (

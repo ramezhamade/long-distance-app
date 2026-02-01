@@ -236,7 +236,11 @@ function calculateWinner(game, puzzleId, data) {
   const r1 = puzzle.results[p1];
   const r2 = puzzle.results[p2];
 
-  if (!r1.completed || !r2.completed) return;
+  // Check if both players have finished (submitted results)
+  // For Wordle: completed is set when game ends (win or lose all attempts)
+  // For Connections: completed is set when succeeded or failed (4 mistakes)
+  const bothFinished = (r1.timestamp && r2.timestamp);
+  if (!bothFinished) return;
 
   let winner = null;
   if (game === 'wordle') {
@@ -248,8 +252,11 @@ function calculateWinner(game, puzzleId, data) {
     else if (r2.guesses < r1.guesses) winner = p2;
     else winner = 'tie';
   } else if (game === 'connections') {
-    // Fewer mistakes wins (if both completed)
-    if (r1.mistakes < r2.mistakes) winner = p1;
+    // If one completed successfully and one failed, successful player wins
+    if (r1.completed && !r2.completed) winner = p1;
+    else if (r2.completed && !r1.completed) winner = p2;
+    // If both completed or both failed, fewer mistakes wins
+    else if (r1.mistakes < r2.mistakes) winner = p1;
     else if (r2.mistakes < r1.mistakes) winner = p2;
     else winner = 'tie';
   }
@@ -275,10 +282,8 @@ function calculateWinner(game, puzzleId, data) {
     data.scoreboard.byGame[game][p2].ties++;
   }
 
-  // If both players completed, advance to next puzzle
-  if (r1.completed && r2.completed) {
-    data.games[game].currentPuzzleId++;
-  }
+  // If both players finished, advance to next puzzle
+  data.games[game].currentPuzzleId++;
 }
 
 // WORDLE ENDPOINTS
@@ -287,6 +292,15 @@ app.get('/api/games/wordle/today', authenticate, (req, res) => {
   initializeGameData(data);
 
   const puzzleId = data.games.wordle.currentPuzzleId;
+
+  // Check if we've run out of unique words
+  if (puzzleId >= wordleWords.length) {
+    return res.status(400).json({
+      error: 'No more unique puzzles available',
+      message: `You've completed all ${wordleWords.length} Wordle puzzles! 🎉`
+    });
+  }
+
   const word = getWordByPuzzleId(puzzleId);
   const playerName = getPlayerName(req);
 
@@ -309,7 +323,7 @@ app.get('/api/games/wordle/today', authenticate, (req, res) => {
     word: word,
     validWords: wordleWords,
     myResult: myResult || null,
-    opponentResult: otherResult && otherResult.completed ? otherResult : null,
+    opponentResult: otherResult && otherResult.timestamp ? otherResult : null,
     winner: puzzle.winner || null
   });
 });
@@ -346,6 +360,15 @@ app.get('/api/games/connections/today', authenticate, (req, res) => {
   initializeGameData(data);
 
   const puzzleId = data.games.connections.currentPuzzleId;
+
+  // Check if we've run out of unique puzzles
+  if (puzzleId >= connectionsPuzzles.length) {
+    return res.status(400).json({
+      error: 'No more unique puzzles available',
+      message: `You've completed all ${connectionsPuzzles.length} Connections puzzles! 🎉`
+    });
+  }
+
   const puzzle = getPuzzleByPuzzleId(puzzleId);
   const playerName = getPlayerName(req);
 
@@ -367,7 +390,7 @@ app.get('/api/games/connections/today', authenticate, (req, res) => {
     puzzleId,
     groups: currentPuzzle.groups,
     myResult: myResult || null,
-    opponentResult: otherResult && otherResult.completed ? otherResult : null,
+    opponentResult: otherResult && otherResult.timestamp ? otherResult : null,
     winner: currentPuzzle.winner || null
   });
 });
