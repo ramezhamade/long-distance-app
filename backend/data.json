@@ -33,236 +33,20 @@
   ],
   "games": {
     "wordle": {
-      "dailyPuzzles": {
-        "2026-1-31": {
-          "word": "SOFT",
-          "date": "2026-1-31",
-          "results": {}
-        }
-      },
       "currentPuzzleId": 0,
-      "puzzles": {
-        "0": {
-          "word": "HEART",
-          "puzzleId": 0,
-          "results": {}
-        }
-      }
+      "puzzles": {},
+      "usedWordIndices": []
     },
     "connections": {
-      "dailyPuzzles": {},
       "currentPuzzleId": 0,
-      "puzzles": {}
+      "puzzles": {},
+      "usedPuzzleIndices": []
     }
   },
   "whoMoreLikely": {
-    "questions": [
-      {
-        "id": "wml_1769883233482_09sxurc15",
-        "text": "Who's more likely to fall asleep during a movie?",
-        "category": "funny",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_v8dqrdcxm",
-        "text": "Who's more likely to forget where they put their phone?",
-        "category": "funny",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_silyfw4hh",
-        "text": "Who's more likely to trip over nothing?",
-        "category": "funny",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_na9c8uzin",
-        "text": "Who's more likely to laugh at their own jokes?",
-        "category": "funny",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_9itqr507j",
-        "text": "Who's more likely to snore louder?",
-        "category": "funny",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_iomyw39m7",
-        "text": "Who's more likely to eat the last slice without asking?",
-        "category": "funny",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_r1509qyik",
-        "text": "Who's more likely to sing in the shower?",
-        "category": "funny",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_g80yqcsf8",
-        "text": "Who's more likely to talk to themselves?",
-        "category": "funny",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_fi47zlhgm",
-        "text": "Who's more likely to cry during a sad movie?",
-        "category": "funny",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_0kfah3zbo",
-        "text": "Who's more likely to make weird faces in photos?",
-        "category": "funny",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_kptq6tmyt",
-        "text": "Who's more likely to forget our anniversary?",
-        "category": "roasty",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_wks0dd4hg",
-        "text": "Who's more likely to be late to everything?",
-        "category": "roasty",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_1wto3hroo",
-        "text": "Who's more likely to lose an argument and not admit it?",
-        "category": "roasty",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_9bj0kz8or",
-        "text": "Who's more likely to leave dirty dishes in the sink?",
-        "category": "roasty",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_gd804o1wj",
-        "text": "Who's more likely to hog the blanket?",
-        "category": "roasty",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_ugiilc3mt",
-        "text": "Who's more likely to be grumpy in the morning?",
-        "category": "roasty",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_blwa90jjg",
-        "text": "Who's more likely to give terrible directions?",
-        "category": "roasty",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_lh8g2nd64",
-        "text": "Who's more likely to start a fight over nothing?",
-        "category": "roasty",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_dzbgnango",
-        "text": "Who's more likely to be the bigger drama queen?",
-        "category": "roasty",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_f1aaq5r67",
-        "text": "Who's more likely to spend hours getting ready?",
-        "category": "roasty",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_6jxlp8nc4",
-        "text": "Who's more likely to be worse with money?",
-        "category": "roasty",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_4lfaonveh",
-        "text": "Who's more likely to embarrass the other in public?",
-        "category": "roasty",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_zkbhgv10u",
-        "text": "Who's more likely to plan a surprise date?",
-        "category": "sweet",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_so01q2dn1",
-        "text": "Who's more likely to say 'I love you' first?",
-        "category": "sweet",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_6nyxl9bi3",
-        "text": "Who's more likely to remember small details?",
-        "category": "sweet",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_w9tdgl3lu",
-        "text": "Who's more likely to give better gifts?",
-        "category": "sweet",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_16oqjrfnq",
-        "text": "Who's more likely to apologize first after a fight?",
-        "category": "sweet",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_8wqxesc9l",
-        "text": "Who's more likely to make breakfast in bed?",
-        "category": "sweet",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_j0kossjlw",
-        "text": "Who's more likely to write a love letter?",
-        "category": "sweet",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_grnsy8711",
-        "text": "Who's more likely to be more romantic?",
-        "category": "sweet",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_h5nb52cak",
-        "text": "Who's more likely to cry happy tears at the wedding?",
-        "category": "sweet",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_68nt7x78f",
-        "text": "Who's more likely to travel across the world for the other?",
-        "category": "sweet",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_l08n64abr",
-        "text": "Who's more likely to know what the other is thinking?",
-        "category": "sweet",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      },
-      {
-        "id": "wml_1769883233482_e67s65ah7",
-        "text": "Who's more likely to be the better listener?",
-        "category": "sweet",
-        "createdAt": "2026-01-31T18:13:53.482Z"
-      }
-    ],
-    "responses": {}
+    "questions": [],
+    "responses": {},
+    "usedQuestionIds": []
   },
   "scoreboard": {
     "overall": {
@@ -280,25 +64,25 @@
     "byGame": {
       "wordle": {
         "Ramez": {
-          "wins": 1,
+          "wins": 0,
           "losses": 0,
           "avgGuesses": 0
         },
         "Layan": {
           "wins": 0,
-          "losses": 1,
+          "losses": 0,
           "avgGuesses": 0
         }
       },
       "connections": {
         "Ramez": {
-          "wins": 1,
+          "wins": 0,
           "losses": 0,
           "avgMistakes": 0
         },
         "Layan": {
           "wins": 0,
-          "losses": 1,
+          "losses": 0,
           "avgMistakes": 0
         }
       }

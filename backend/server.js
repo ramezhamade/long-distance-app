@@ -223,6 +223,16 @@ const wordleWords = require('./gameContent/wordleWords');
 const connectionsPuzzles = require('./gameContent/connectionsPuzzles');
 const whoMoreLikelyQuestions = require('./gameContent/whoMoreLikelyQuestions');
 
+// Helper function to shuffle an array (Fisher-Yates algorithm)
+function shuffleArray(array) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 // Helper functions
 function initializeGameData(data) {
   if (!data.games) data.games = {};
@@ -244,14 +254,62 @@ function initializeGameData(data) {
   if (!data.games.connections.puzzles) {
     data.games.connections.puzzles = {};
   }
+
+  // Initialize used indices tracking
+  if (!data.games.wordle.usedWordIndices) {
+    data.games.wordle.usedWordIndices = [];
+  }
+  if (!data.games.connections.usedPuzzleIndices) {
+    data.games.connections.usedPuzzleIndices = [];
+  }
+
+  // Initialize whoMoreLikely tracking
+  if (!data.whoMoreLikely) {
+    data.whoMoreLikely = { questions: [], responses: {}, usedQuestionIds: [] };
+  }
+  if (!data.whoMoreLikely.usedQuestionIds) {
+    data.whoMoreLikely.usedQuestionIds = [];
+  }
 }
 
-function getWordByPuzzleId(puzzleId) {
-  return wordleWords[puzzleId % wordleWords.length];
+// Get a random unused word for Wordle
+function getRandomUnusedWord(data) {
+  const usedIndices = data.games.wordle.usedWordIndices || [];
+  const availableIndices = [];
+
+  for (let i = 0; i < wordleWords.length; i++) {
+    if (!usedIndices.includes(i)) {
+      availableIndices.push(i);
+    }
+  }
+
+  if (availableIndices.length === 0) {
+    return null; // All words used
+  }
+
+  // Pick a random index from available
+  const randomIdx = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+  return { word: wordleWords[randomIdx], index: randomIdx };
 }
 
-function getPuzzleByPuzzleId(puzzleId) {
-  return connectionsPuzzles[puzzleId % connectionsPuzzles.length];
+// Get a random unused puzzle for Connections
+function getRandomUnusedPuzzle(data) {
+  const usedIndices = data.games.connections.usedPuzzleIndices || [];
+  const availableIndices = [];
+
+  for (let i = 0; i < connectionsPuzzles.length; i++) {
+    if (!usedIndices.includes(i)) {
+      availableIndices.push(i);
+    }
+  }
+
+  if (availableIndices.length === 0) {
+    return null; // All puzzles used
+  }
+
+  // Pick a random index from available
+  const randomIdx = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+  return { puzzle: connectionsPuzzles[randomIdx], index: randomIdx };
 }
 
 function getPlayerName(req) {
@@ -325,39 +383,53 @@ app.get('/api/games/wordle/today', authenticate, (req, res) => {
   initializeGameData(data);
 
   const puzzleId = data.games.wordle.currentPuzzleId;
+  const playerName = getPlayerName(req);
 
-  // Check if we've run out of unique words
-  if (puzzleId >= wordleWords.length) {
+  // Check if current puzzle already exists
+  if (data.games.wordle.puzzles[puzzleId]) {
+    const puzzle = data.games.wordle.puzzles[puzzleId];
+    const myResult = puzzle.results[playerName];
+    const otherPlayer = playerName === 'Ramez' ? 'Layan' : 'Ramez';
+    const otherResult = puzzle.results[otherPlayer];
+
+    return res.json({
+      puzzleId,
+      word: puzzle.word,
+      validWords: wordleWords,
+      myResult: myResult || null,
+      opponentResult: otherResult && otherResult.timestamp ? otherResult : null,
+      winner: puzzle.winner || null
+    });
+  }
+
+  // Need to create a new puzzle - get a random unused word
+  const wordResult = getRandomUnusedWord(data);
+
+  if (!wordResult) {
     return res.status(400).json({
       error: 'No more unique puzzles available',
       message: `You've completed all ${wordleWords.length} Wordle puzzles! 🎉`
     });
   }
 
-  const word = getWordByPuzzleId(puzzleId);
-  const playerName = getPlayerName(req);
-
-  if (!data.games.wordle.puzzles[puzzleId]) {
-    data.games.wordle.puzzles[puzzleId] = {
-      word,
-      puzzleId,
-      results: {}
-    };
-    writeData(data);
-  }
-
-  const puzzle = data.games.wordle.puzzles[puzzleId];
-  const myResult = puzzle.results[playerName];
-  const otherPlayer = playerName === 'Ramez' ? 'Layan' : 'Ramez';
-  const otherResult = puzzle.results[otherPlayer];
+  // Create the new puzzle with the random word
+  data.games.wordle.puzzles[puzzleId] = {
+    word: wordResult.word,
+    wordIndex: wordResult.index,
+    puzzleId,
+    results: {}
+  };
+  // Mark this word index as used
+  data.games.wordle.usedWordIndices.push(wordResult.index);
+  writeData(data);
 
   res.json({
     puzzleId,
-    word: word,
+    word: wordResult.word,
     validWords: wordleWords,
-    myResult: myResult || null,
-    opponentResult: otherResult && otherResult.timestamp ? otherResult : null,
-    winner: puzzle.winner || null
+    myResult: null,
+    opponentResult: null,
+    winner: null
   });
 });
 
@@ -393,38 +465,64 @@ app.get('/api/games/connections/today', authenticate, (req, res) => {
   initializeGameData(data);
 
   const puzzleId = data.games.connections.currentPuzzleId;
+  const playerName = getPlayerName(req);
 
-  // Check if we've run out of unique puzzles
-  if (puzzleId >= connectionsPuzzles.length) {
+  // Check if current puzzle already exists
+  if (data.games.connections.puzzles[puzzleId]) {
+    const currentPuzzle = data.games.connections.puzzles[puzzleId];
+    const myResult = currentPuzzle.results[playerName];
+    const otherPlayer = playerName === 'Ramez' ? 'Layan' : 'Ramez';
+    const otherResult = currentPuzzle.results[otherPlayer];
+
+    // Shuffle the words within each group for display
+    const shuffledGroups = currentPuzzle.groups.map(group => ({
+      ...group,
+      words: shuffleArray(group.words)
+    }));
+
+    return res.json({
+      puzzleId,
+      groups: shuffledGroups,
+      myResult: myResult || null,
+      opponentResult: otherResult && otherResult.timestamp ? otherResult : null,
+      winner: currentPuzzle.winner || null
+    });
+  }
+
+  // Need to create a new puzzle - get a random unused puzzle
+  const puzzleResult = getRandomUnusedPuzzle(data);
+
+  if (!puzzleResult) {
     return res.status(400).json({
       error: 'No more unique puzzles available',
       message: `You've completed all ${connectionsPuzzles.length} Connections puzzles! 🎉`
     });
   }
 
-  const puzzle = getPuzzleByPuzzleId(puzzleId);
-  const playerName = getPlayerName(req);
+  // Shuffle the groups order and words within each group
+  const shuffledGroups = shuffleArray(puzzleResult.puzzle.groups).map(group => ({
+    ...group,
+    words: shuffleArray(group.words)
+  }));
 
-  if (!data.games.connections.puzzles[puzzleId]) {
-    data.games.connections.puzzles[puzzleId] = {
-      groups: puzzle.groups,
-      puzzleId,
-      results: {}
-    };
-    writeData(data);
-  }
-
-  const currentPuzzle = data.games.connections.puzzles[puzzleId];
-  const myResult = currentPuzzle.results[playerName];
-  const otherPlayer = playerName === 'Ramez' ? 'Layan' : 'Ramez';
-  const otherResult = currentPuzzle.results[otherPlayer];
+  // Create the new puzzle with the random selection
+  data.games.connections.puzzles[puzzleId] = {
+    groups: puzzleResult.puzzle.groups, // Store original for validation
+    shuffledGroups: shuffledGroups,
+    puzzleIndex: puzzleResult.index,
+    puzzleId,
+    results: {}
+  };
+  // Mark this puzzle index as used
+  data.games.connections.usedPuzzleIndices.push(puzzleResult.index);
+  writeData(data);
 
   res.json({
     puzzleId,
-    groups: currentPuzzle.groups,
-    myResult: myResult || null,
-    opponentResult: otherResult && otherResult.timestamp ? otherResult : null,
-    winner: currentPuzzle.winner || null
+    groups: shuffledGroups,
+    myResult: null,
+    opponentResult: null,
+    winner: null
   });
 });
 
@@ -452,26 +550,32 @@ app.post('/api/games/connections/submit', authenticate, (req, res) => {
   res.json({ success: true });
 });
 
-// Helper function to shuffle questions by alternating categories
+// Helper function to shuffle questions by alternating categories (shuffled within each category)
 function shuffleQuestionsByCategory(questionsObj) {
-  // Group questions by category
+  // Group questions by category and shuffle within each category
   const categorizedQuestions = {};
-  Object.keys(questionsObj).forEach(category => {
-    categorizedQuestions[category] = questionsObj[category].map(text => ({
-      id: `wml_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+  const categories = Object.keys(questionsObj);
+
+  categories.forEach(category => {
+    // Shuffle questions within the category
+    const shuffledCategoryQuestions = shuffleArray(questionsObj[category]);
+    categorizedQuestions[category] = shuffledCategoryQuestions.map(text => ({
+      id: `wml_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       text,
       category,
       createdAt: new Date().toISOString()
     }));
   });
 
-  // Interleave questions from different categories
+  // Shuffle the order of categories themselves
+  const shuffledCategories = shuffleArray(categories);
+
+  // Interleave questions from different categories (now shuffled)
   const allQuestions = [];
-  const categories = Object.keys(categorizedQuestions);
-  let maxLength = Math.max(...categories.map(cat => categorizedQuestions[cat].length));
+  const maxLength = Math.max(...shuffledCategories.map(cat => categorizedQuestions[cat].length));
 
   for (let i = 0; i < maxLength; i++) {
-    categories.forEach(category => {
+    shuffledCategories.forEach(category => {
       if (categorizedQuestions[category][i]) {
         allQuestions.push(categorizedQuestions[category][i]);
       }
@@ -536,6 +640,22 @@ app.post('/api/who-more-likely/answer', authenticate, (req, res) => {
   }
 
   data.whoMoreLikely.responses[questionId][playerName] = answer;
+
+  // Check if both players have answered - if so, mark as used
+  const responses = data.whoMoreLikely.responses[questionId];
+  const otherPlayer = playerName === 'Ramez' ? 'Layan' : 'Ramez';
+  if (responses[playerName] && responses[otherPlayer]) {
+    // Both answered - mark question as used and remove from active list
+    if (!data.whoMoreLikely.usedQuestionIds) {
+      data.whoMoreLikely.usedQuestionIds = [];
+    }
+    if (!data.whoMoreLikely.usedQuestionIds.includes(questionId)) {
+      data.whoMoreLikely.usedQuestionIds.push(questionId);
+    }
+    // Remove from active questions list
+    data.whoMoreLikely.questions = data.whoMoreLikely.questions.filter(q => q.id !== questionId);
+  }
+
   writeData(data);
 
   res.json({ success: true });
