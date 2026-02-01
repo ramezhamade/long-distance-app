@@ -448,7 +448,14 @@ app.post('/api/games/wordle/submit', authenticate, async (req, res) => {
       const { data: puzzle } = await supabase.from('wordle_puzzles').select('*').eq('puzzle_id', puzzleId).single();
       if (!puzzle) return res.status(400).json({ error: 'No active puzzle' });
 
-      await supabase.from('wordle_results').upsert([{ puzzle_id: puzzleId, player_name: playerName, guesses, won, attempts, completed: true, timestamp: new Date().toISOString() }]);
+      const { error: upsertError } = await supabase.from('wordle_results').upsert(
+        [{ puzzle_id: puzzleId, player_name: playerName, guesses, won, attempts, completed: true, timestamp: new Date().toISOString() }],
+        { onConflict: 'puzzle_id,player_name' }
+      );
+      if (upsertError) {
+        console.error('Error upserting wordle result:', upsertError);
+        throw upsertError;
+      }
 
       const { data: results } = await supabase.from('wordle_results').select('*').eq('puzzle_id', puzzleId);
 
@@ -598,7 +605,14 @@ app.post('/api/games/connections/submit', authenticate, async (req, res) => {
       const { data: puzzle } = await supabase.from('connections_puzzles').select('*').eq('puzzle_id', puzzleId).single();
       if (!puzzle) return res.status(400).json({ error: 'No active puzzle' });
 
-      await supabase.from('connections_results').upsert([{ puzzle_id: puzzleId, player_name: playerName, mistakes, completed, timestamp: new Date().toISOString() }]);
+      const { error: upsertError } = await supabase.from('connections_results').upsert(
+        [{ puzzle_id: puzzleId, player_name: playerName, mistakes, completed, timestamp: new Date().toISOString() }],
+        { onConflict: 'puzzle_id,player_name' }
+      );
+      if (upsertError) {
+        console.error('Error upserting connections result:', upsertError);
+        throw upsertError;
+      }
 
       const { data: results } = await supabase.from('connections_results').select('*').eq('puzzle_id', puzzleId);
 
@@ -793,12 +807,25 @@ app.post('/api/who-more-likely/answer', authenticate, async (req, res) => {
 
   if (USE_SUPABASE) {
     try {
-      await supabase.from('wml_responses').upsert([{ question_id: questionId, player_name: playerName, answer, timestamp: new Date().toISOString() }]);
+      const { error } = await supabase.from('wml_responses').upsert(
+        [{ question_id: questionId, player_name: playerName, answer, timestamp: new Date().toISOString() }],
+        { onConflict: 'question_id,player_name' }
+      );
+      if (error) {
+        console.error('Error upserting wml response:', error);
+        throw error;
+      }
 
       const { data: responses } = await supabase.from('wml_responses').select('*').eq('question_id', questionId);
 
       if (responses.length === 2) {
-        await supabase.from('wml_used_questions').upsert([{ question_id: questionId, used_at: new Date().toISOString() }]);
+        const { error: usedError } = await supabase.from('wml_used_questions').upsert(
+          [{ question_id: questionId, used_at: new Date().toISOString() }],
+          { onConflict: 'question_id' }
+        );
+        if (usedError) {
+          console.error('Error upserting used question:', usedError);
+        }
       }
 
       res.json({ success: true });
