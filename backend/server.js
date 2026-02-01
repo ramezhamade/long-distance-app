@@ -7,12 +7,32 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// Simple authentication - Change these credentials!
-const AUTH_USERNAME = 'kingramez';
-const AUTH_PASSWORD = 'Layan';
+// Player credentials
+const PLAYERS = {
+  ramez: {
+    username: 'ramez',
+    password: 'ramez123',
+    playerName: 'Ramez'
+  },
+  layan: {
+    username: 'layan',
+    password: 'Layan',
+    playerName: 'Layan'
+  }
+};
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// Helper to validate credentials and get player
+function validateCredentials(username, password) {
+  for (const player of Object.values(PLAYERS)) {
+    if (player.username === username && player.password === password) {
+      return player.playerName;
+    }
+  }
+  return null;
+}
 
 // Simple authentication middleware
 function authenticate(req, res, next) {
@@ -26,7 +46,9 @@ function authenticate(req, res, next) {
   const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
   const [username, password] = credentials.split(':');
 
-  if (username === AUTH_USERNAME && password === AUTH_PASSWORD) {
+  const playerName = validateCredentials(username, password);
+  if (playerName) {
+    req.playerName = playerName;
     next();
   } else {
     res.status(401).json({ error: 'Invalid credentials' });
@@ -39,7 +61,19 @@ function readData() {
   try {
     if (fs.existsSync(DATA_FILE)) {
       const data = fs.readFileSync(DATA_FILE, 'utf8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+
+      // Initialize whoMoreLikely structure if missing
+      if (!parsed.whoMoreLikely) {
+        parsed.whoMoreLikely = {
+          questions: [],
+          responses: {}
+        };
+      }
+      if (!parsed.whoMoreLikely.questions) parsed.whoMoreLikely.questions = [];
+      if (!parsed.whoMoreLikely.responses) parsed.whoMoreLikely.responses = {};
+
+      return parsed;
     }
   } catch (error) {
     console.error('Error reading data:', error);
@@ -50,6 +84,10 @@ function readData() {
       relationshipStart: null,
       lastMeeting: null,
       nextMeeting: null
+    },
+    whoMoreLikely: {
+      questions: [],
+      responses: {}
     }
   };
 }
@@ -66,8 +104,13 @@ function writeData(data) {
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
 
-  if (username === AUTH_USERNAME && password === AUTH_PASSWORD) {
-    res.json({ success: true, message: 'Login successful' });
+  const playerName = validateCredentials(username, password);
+  if (playerName) {
+    res.json({
+      success: true,
+      message: 'Login successful',
+      playerName: playerName
+    });
   } else {
     res.status(401).json({ success: false, error: 'Invalid credentials' });
   }
@@ -179,7 +222,7 @@ function getPuzzleByPuzzleId(puzzleId) {
 }
 
 function getPlayerName(req) {
-  return req.headers['x-player-name'] || 'Unknown';
+  return req.playerName || 'Unknown';
 }
 
 function calculateWinner(game, puzzleId, data) {

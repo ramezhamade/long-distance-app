@@ -4,7 +4,6 @@ import Calendar from './components/Calendar';
 import Countdown from './components/Countdown';
 import Statistics from './components/Statistics';
 import Login from './components/Login';
-import PlayerSelector from './components/PlayerSelector';
 import TabNavigation from './components/TabNavigation';
 import GamesHub from './components/games/GamesHub';
 import WhoMoreLikely from './components/whoMoreLikely/WhoMoreLikely';
@@ -20,7 +19,6 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authToken, setAuthToken] = useState(null);
   const [playerName, setPlayerName] = useState(null);
-  const [showPlayerSelector, setShowPlayerSelector] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
 
   useEffect(() => {
@@ -56,20 +54,10 @@ function App() {
     return headers;
   };
 
-  const handleLogin = (credentials) => {
+  const handleLogin = (credentials, playerName) => {
     setAuthToken(credentials);
     setIsAuthenticated(true);
-
-    // Check if player is already selected
-    const savedPlayer = localStorage.getItem('playerName');
-    if (!savedPlayer) {
-      setShowPlayerSelector(true);
-    }
-  };
-
-  const handlePlayerSelect = (player) => {
-    setPlayerName(player);
-    setShowPlayerSelector(false);
+    setPlayerName(playerName);
   };
 
   const handleLogout = () => {
@@ -168,13 +156,6 @@ function App() {
 
   return (
     <div className="app">
-      {showPlayerSelector && (
-        <PlayerSelector
-          onSelectPlayer={handlePlayerSelect}
-          onClose={() => setShowPlayerSelector(false)}
-        />
-      )}
-
       <header className="app-header">
         <h1>The Lamez Hub</h1>
         <p>Where Ramez & Layan connect across the miles</p>

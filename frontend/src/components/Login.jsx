@@ -25,10 +25,11 @@ function Login({ onLogin }) {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Store credentials in localStorage for subsequent requests
+        // Store credentials and player name in localStorage
         const credentials = btoa(`${username}:${password}`);
         localStorage.setItem('auth', credentials);
-        onLogin(credentials);
+        localStorage.setItem('playerName', data.playerName);
+        onLogin(credentials, data.playerName);
       } else {
         setError('Invalid username or password');
       }
@@ -79,8 +80,8 @@ function Login({ onLogin }) {
         </form>
 
         <p className="login-footer">
-          Default credentials: username: <strong>couple</strong>, password:{' '}
-          <strong>ourLove2024</strong>
+          Ramez: <strong>ramez</strong> / <strong>ramez123</strong><br />
+          Layan: <strong>layan</strong> / <strong>Layan</strong>
         </p>
       </div>
     </div>
