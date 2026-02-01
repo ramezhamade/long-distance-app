@@ -70,6 +70,27 @@ function App() {
     setStatistics(null);
   };
 
+  const handleDownloadData = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/download-data`, {
+        headers: getAuthHeaders(),
+        responseType: 'blob' // Important for file download
+      });
+
+      // Create a download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `data-backup-${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading data:', error);
+      alert('Failed to download data backup');
+    }
+  };
+
   const fetchStatistics = async () => {
     try {
       const response = await axios.get(`${API_URL}/statistics`, {
@@ -161,6 +182,9 @@ function App() {
         <p>Where Ramez & Layan connect across the miles</p>
         <div className="header-actions">
           {playerName && <span className="current-player">Playing as: {playerName}</span>}
+          <button onClick={handleDownloadData} className="download-button" title="Download data backup">
+            💾 Backup
+          </button>
           <button onClick={handleLogout} className="logout-button">
             Logout
           </button>

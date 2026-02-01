@@ -569,10 +569,26 @@
   line-height: 1.5;
 }
 
-.logout-button {
+.header-actions {
   position: absolute;
   top: 1rem;
   right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.current-player {
+  color: white;
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+}
+
+.download-button,
+.logout-button {
   background: rgba(255, 255, 255, 0.2);
   color: white;
   border: 2px solid white;
@@ -583,6 +599,7 @@
   transition: all 0.2s;
 }
 
+.download-button:hover,
 .logout-button:hover {
   background: white;
   color: #667eea;
@@ -597,10 +614,21 @@
     font-size: 1.5rem;
   }
 
-  .logout-button {
+  .header-actions {
     position: static;
+    flex-direction: column;
     width: 100%;
     margin-top: 1rem;
+  }
+
+  .download-button,
+  .logout-button {
+    width: 100%;
+  }
+
+  .current-player {
+    width: 100%;
+    text-align: center;
   }
 
   .app-header {
@@ -765,6 +793,7 @@
     gap: 0.5rem;
   }
 
+  .download-button,
   .logout-button {
     position: static;
     margin: 0;
