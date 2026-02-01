@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 5001;
 const PLAYERS = {
   ramez: {
     username: 'ramez',
-    password: 'ramez123',
+    password: 'Ramez',
     playerName: 'Ramez'
   },
   layan: {
@@ -452,24 +452,42 @@ app.post('/api/games/connections/submit', authenticate, (req, res) => {
   res.json({ success: true });
 });
 
+// Helper function to shuffle questions by alternating categories
+function shuffleQuestionsByCategory(questionsObj) {
+  // Group questions by category
+  const categorizedQuestions = {};
+  Object.keys(questionsObj).forEach(category => {
+    categorizedQuestions[category] = questionsObj[category].map(text => ({
+      id: `wml_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      text,
+      category,
+      createdAt: new Date().toISOString()
+    }));
+  });
+
+  // Interleave questions from different categories
+  const allQuestions = [];
+  const categories = Object.keys(categorizedQuestions);
+  let maxLength = Math.max(...categories.map(cat => categorizedQuestions[cat].length));
+
+  for (let i = 0; i < maxLength; i++) {
+    categories.forEach(category => {
+      if (categorizedQuestions[category][i]) {
+        allQuestions.push(categorizedQuestions[category][i]);
+      }
+    });
+  }
+
+  return allQuestions;
+}
+
 // WHO'S MORE LIKELY ENDPOINTS
 app.get('/api/who-more-likely/questions', authenticate, (req, res) => {
   const data = readData();
 
   // Initialize questions if empty
   if (!data.whoMoreLikely.questions || data.whoMoreLikely.questions.length === 0) {
-    const allQuestions = [];
-    Object.keys(whoMoreLikelyQuestions).forEach(category => {
-      whoMoreLikelyQuestions[category].forEach(text => {
-        allQuestions.push({
-          id: `wml_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          text,
-          category,
-          createdAt: new Date().toISOString()
-        });
-      });
-    });
-    data.whoMoreLikely.questions = allQuestions;
+    data.whoMoreLikely.questions = shuffleQuestionsByCategory(whoMoreLikelyQuestions);
     writeData(data);
   }
 
@@ -482,18 +500,7 @@ app.get('/api/who-more-likely/next', authenticate, (req, res) => {
 
   // Initialize questions if empty
   if (!data.whoMoreLikely.questions || data.whoMoreLikely.questions.length === 0) {
-    const allQuestions = [];
-    Object.keys(whoMoreLikelyQuestions).forEach(category => {
-      whoMoreLikelyQuestions[category].forEach(text => {
-        allQuestions.push({
-          id: `wml_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          text,
-          category,
-          createdAt: new Date().toISOString()
-        });
-      });
-    });
-    data.whoMoreLikely.questions = allQuestions;
+    data.whoMoreLikely.questions = shuffleQuestionsByCategory(whoMoreLikelyQuestions);
     writeData(data);
   }
 
