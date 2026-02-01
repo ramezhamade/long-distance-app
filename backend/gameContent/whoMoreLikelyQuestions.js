@@ -15,7 +15,23 @@ const whoMoreLikelyQuestions = {
     "Who's more likely to tap out first?",
     "Who's most likely to send nudes?",
     "Who's most likely to get turned on faster?",
+    "Who's more likely to start something when you said you were 'just cuddling'?",
+    "Who's more likely to initiate after a long day?",
+    "Who's more likely to want round two?",
+    "Who's more likely to enjoy slow and teasing over quick and intense?",
+    "Who's more likely to surprise the other out of nowhere?",
+    "Who's more likely to be in the mood at the worst possible time?",
+    "Who's more likely to push boundaries (in a good way)?",
+    "Who's more likely to get turned on by eye contact alone?",
+    "Who's more likely to suggest a spontaneous bedroom idea?",
+    "Who's more likely to keep things spicy after three years?",
+    "Who's more likely to remember exactly what the other likes?",
+    "Who's more likely to flirt with their partner in public?",
+    "Who's more likely to start something just to mess with the other?",
+    "Who's more likely to be more confident now than at the beginning?",
+    "Who's more likely to initiate just because it's been a while?"
   ],
+
   funny: [
     "Who's more likely to fall asleep during a movie?",
     "Who's more likely to forget where they put their phone?",
@@ -28,8 +44,9 @@ const whoMoreLikelyQuestions = {
     "Who's more likely to make weird faces in photos?",
     "Who's more likely to lie about wanting to do something?",
     "Who's most likely to wear the pants in the relationship?",
-    "Who's most likely to pay for Dinners?",
+    "Who's most likely to pay for Dinners?"
   ],
+
   roasty: [
     "Who's more likely to forget our anniversary?",
     "Who's more likely to be late to everything?",
@@ -42,8 +59,9 @@ const whoMoreLikelyQuestions = {
     "Who's more likely to be the bigger drama queen?",
     "Who's more likely to spend hours getting ready?",
     "Who's more likely to be worse with money?",
-    "Who's more likely to embarrass the other in public?",
+    "Who's more likely to embarrass the other in public?"
   ],
+
   sweet: [
     "Who's more likely to plan a surprise date?",
     "Who's more likely to say 'I love you' first?",
@@ -56,7 +74,7 @@ const whoMoreLikelyQuestions = {
     "Who's more likely to cry happy tears at the wedding?",
     "Who's more likely to travel across the world for the other?",
     "Who's more likely to know what the other is thinking?",
-    "Who's more likely to be the better listener?",
+    "Who's more likely to be the better listener?"
   ]
 };
 
