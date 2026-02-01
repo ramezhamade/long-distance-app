@@ -1,8 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const fs = require('fs');
-const path = require('path');
+const { readData, writeData, closeDatabase } = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -55,96 +54,8 @@ function authenticate(req, res, next) {
   }
 }
 
-// Use persistent directory from environment variable or default to current directory
-// On Render, set DATA_DIR to /opt/render/project/data for persistent storage
-const DATA_DIR = process.env.DATA_DIR || __dirname;
-const DATA_FILE = path.join(DATA_DIR, 'data.json');
-
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-function readData() {
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      const data = fs.readFileSync(DATA_FILE, 'utf8');
-      const parsed = JSON.parse(data);
-
-      // Initialize whoMoreLikely structure if missing
-      if (!parsed.whoMoreLikely) {
-        parsed.whoMoreLikely = {
-          questions: [],
-          responses: {}
-        };
-      }
-      if (!parsed.whoMoreLikely.questions) parsed.whoMoreLikely.questions = [];
-      if (!parsed.whoMoreLikely.responses) parsed.whoMoreLikely.responses = {};
-
-      console.log(`[${new Date().toISOString()}] Data loaded from ${DATA_FILE}`);
-      return parsed;
-    } else {
-      console.log(`[${new Date().toISOString()}] Data file not found, creating new one at ${DATA_FILE}`);
-    }
-  } catch (error) {
-    console.error('Error reading data:', error);
-    console.error('DATA_FILE:', DATA_FILE);
-  }
-
-  // Return default data and save it
-  const defaultData = {
-    events: [],
-    statistics: {
-      relationshipStart: null,
-      lastMeeting: null,
-      nextMeeting: null
-    },
-    whoMoreLikely: {
-      questions: [],
-      responses: {}
-    },
-    games: {
-      wordle: {
-        currentPuzzleId: 0,
-        puzzles: {}
-      },
-      connections: {
-        currentPuzzleId: 0,
-        puzzles: {}
-      }
-    },
-    scoreboard: {
-      overall: {
-        Ramez: { wins: 0, losses: 0, ties: 0 },
-        Layan: { wins: 0, losses: 0, ties: 0 }
-      },
-      byGame: {
-        wordle: {
-          Ramez: { wins: 0, losses: 0, ties: 0 },
-          Layan: { wins: 0, losses: 0, ties: 0 }
-        },
-        connections: {
-          Ramez: { wins: 0, losses: 0, ties: 0 },
-          Layan: { wins: 0, losses: 0, ties: 0 }
-        }
-      }
-    }
-  };
-
-  writeData(defaultData);
-  return defaultData;
-}
-
-function writeData(data) {
-  try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-    console.log(`[${new Date().toISOString()}] Data saved to ${DATA_FILE}`);
-  } catch (error) {
-    console.error('Error writing data:', error);
-    console.error('DATA_FILE:', DATA_FILE);
-    console.error('DATA_DIR:', DATA_DIR);
-  }
-}
+// MongoDB is now used for data persistence (see database.js)
+// Set MONGODB_URI environment variable in Render dashboard
 
 // Login endpoint
 app.post('/api/login', (req, res) => {
@@ -163,13 +74,13 @@ app.post('/api/login', (req, res) => {
 });
 
 // Protected routes
-app.get('/api/events', authenticate, (req, res) => {
-  const data = readData();
+app.get('/api/events', authenticate, async (req, res) => {
+  const data = await readData();
   res.json(data.events);
 });
 
-app.post('/api/events', authenticate, (req, res) => {
-  const data = readData();
+app.post('/api/events', authenticate, async (req, res) => {
+  const data = await readData();
   const newEvent = {
     id: Date.now().toString(),
     title: req.body.title,
@@ -178,19 +89,19 @@ app.post('/api/events', authenticate, (req, res) => {
     createdAt: new Date().toISOString()
   };
   data.events.push(newEvent);
-  writeData(data);
+  await writeData(data);
   res.status(201).json(newEvent);
 });
 
-app.delete('/api/events/:id', authenticate, (req, res) => {
-  const data = readData();
+app.delete('/api/events/:id', authenticate, async (req, res) => {
+  const data = await readData();
   data.events = data.events.filter(event => event.id !== req.params.id);
-  writeData(data);
+  await writeData(data);
   res.status(204).send();
 });
 
-app.put('/api/events/:id', authenticate, (req, res) => {
-  const data = readData();
+app.put('/api/events/:id', authenticate, async (req, res) => {
+  const data = await readData();
   const index = data.events.findIndex(event => event.id === req.params.id);
   if (index !== -1) {
     data.events[index] = {
@@ -199,15 +110,15 @@ app.put('/api/events/:id', authenticate, (req, res) => {
       date: req.body.date,
       description: req.body.description || ''
     };
-    writeData(data);
+    await writeData(data);
     res.json(data.events[index]);
   } else {
     res.status(404).json({ error: 'Event not found' });
   }
 });
 
-app.get('/api/statistics', authenticate, (req, res) => {
-  const data = readData();
+app.get('/api/statistics', authenticate, async (req, res) => {
+  const data = await readData();
   if (!data.statistics) {
     data.statistics = {
       relationshipStart: null,
@@ -218,14 +129,14 @@ app.get('/api/statistics', authenticate, (req, res) => {
   res.json(data.statistics);
 });
 
-app.put('/api/statistics', authenticate, (req, res) => {
-  const data = readData();
+app.put('/api/statistics', authenticate, async (req, res) => {
+  const data = await readData();
   data.statistics = {
     relationshipStart: req.body.relationshipStart || null,
     lastMeeting: req.body.lastMeeting || null,
     nextMeeting: req.body.nextMeeting || null
   };
-  writeData(data);
+  await writeData(data);
   res.json(data.statistics);
 });
 
@@ -333,8 +244,8 @@ function calculateWinner(game, puzzleId, data) {
 }
 
 // WORDLE ENDPOINTS
-app.get('/api/games/wordle/today', authenticate, (req, res) => {
-  const data = readData();
+app.get('/api/games/wordle/today', authenticate, async (req, res) => {
+  const data = await readData();
   initializeGameData(data);
 
   const puzzleId = data.games.wordle.currentPuzzleId;
@@ -356,7 +267,7 @@ app.get('/api/games/wordle/today', authenticate, (req, res) => {
       puzzleId,
       results: {}
     };
-    writeData(data);
+    await writeData(data);
   }
 
   const puzzle = data.games.wordle.puzzles[puzzleId];
@@ -374,8 +285,8 @@ app.get('/api/games/wordle/today', authenticate, (req, res) => {
   });
 });
 
-app.post('/api/games/wordle/submit', authenticate, (req, res) => {
-  const data = readData();
+app.post('/api/games/wordle/submit', authenticate, async (req, res) => {
+  const data = await readData();
   initializeGameData(data);
 
   const puzzleId = data.games.wordle.currentPuzzleId;
@@ -395,14 +306,14 @@ app.post('/api/games/wordle/submit', authenticate, (req, res) => {
   };
 
   calculateWinner('wordle', puzzleId, data);
-  writeData(data);
+  await writeData(data);
 
   res.json({ success: true });
 });
 
 // CONNECTIONS ENDPOINTS
-app.get('/api/games/connections/today', authenticate, (req, res) => {
-  const data = readData();
+app.get('/api/games/connections/today', authenticate, async (req, res) => {
+  const data = await readData();
   initializeGameData(data);
 
   const puzzleId = data.games.connections.currentPuzzleId;
@@ -424,7 +335,7 @@ app.get('/api/games/connections/today', authenticate, (req, res) => {
       puzzleId,
       results: {}
     };
-    writeData(data);
+    await writeData(data);
   }
 
   const currentPuzzle = data.games.connections.puzzles[puzzleId];
@@ -441,8 +352,8 @@ app.get('/api/games/connections/today', authenticate, (req, res) => {
   });
 });
 
-app.post('/api/games/connections/submit', authenticate, (req, res) => {
-  const data = readData();
+app.post('/api/games/connections/submit', authenticate, async (req, res) => {
+  const data = await readData();
   initializeGameData(data);
 
   const puzzleId = data.games.connections.currentPuzzleId;
@@ -460,14 +371,14 @@ app.post('/api/games/connections/submit', authenticate, (req, res) => {
   };
 
   calculateWinner('connections', puzzleId, data);
-  writeData(data);
+  await writeData(data);
 
   res.json({ success: true });
 });
 
 // WHO'S MORE LIKELY ENDPOINTS
-app.get('/api/who-more-likely/questions', authenticate, (req, res) => {
-  const data = readData();
+app.get('/api/who-more-likely/questions', authenticate, async (req, res) => {
+  const data = await readData();
 
   // Initialize questions if empty
   if (!data.whoMoreLikely.questions || data.whoMoreLikely.questions.length === 0) {
@@ -483,14 +394,14 @@ app.get('/api/who-more-likely/questions', authenticate, (req, res) => {
       });
     });
     data.whoMoreLikely.questions = allQuestions;
-    writeData(data);
+    await writeData(data);
   }
 
   res.json(data.whoMoreLikely.questions);
 });
 
-app.get('/api/who-more-likely/next', authenticate, (req, res) => {
-  const data = readData();
+app.get('/api/who-more-likely/next', authenticate, async (req, res) => {
+  const data = await readData();
   const playerName = getPlayerName(req);
 
   // Initialize questions if empty
@@ -507,7 +418,7 @@ app.get('/api/who-more-likely/next', authenticate, (req, res) => {
       });
     });
     data.whoMoreLikely.questions = allQuestions;
-    writeData(data);
+    await writeData(data);
   }
 
   // Find a question that this player hasn't answered
@@ -532,8 +443,8 @@ app.get('/api/who-more-likely/next', authenticate, (req, res) => {
   });
 });
 
-app.post('/api/who-more-likely/answer', authenticate, (req, res) => {
-  const data = readData();
+app.post('/api/who-more-likely/answer', authenticate, async (req, res) => {
+  const data = await readData();
   const playerName = getPlayerName(req);
   const { questionId, answer } = req.body;
 
@@ -542,14 +453,14 @@ app.post('/api/who-more-likely/answer', authenticate, (req, res) => {
   }
 
   data.whoMoreLikely.responses[questionId][playerName] = answer;
-  writeData(data);
+  await writeData(data);
 
   res.json({ success: true });
 });
 
 // Get history of answered questions with responses
-app.get('/api/who-more-likely/history', authenticate, (req, res) => {
-  const data = readData();
+app.get('/api/who-more-likely/history', authenticate, async (req, res) => {
+  const data = await readData();
   const history = [];
 
   // Get all questions that have been answered by both players
@@ -571,14 +482,25 @@ app.get('/api/who-more-likely/history', authenticate, (req, res) => {
 });
 
 // SCOREBOARD ENDPOINT
-app.get('/api/scoreboard', authenticate, (req, res) => {
-  const data = readData();
+app.get('/api/scoreboard', authenticate, async (req, res) => {
+  const data = await readData();
   res.json(data.scoreboard);
 });
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Data directory: ${DATA_DIR}`);
-  console.log(`Data file: ${DATA_FILE}`);
-  console.log(`Data persistence: ${DATA_DIR === __dirname ? '⚠️  Ephemeral (local dev)' : '✅ Persistent disk'}`);
+  console.log(`Data persistence: MongoDB (${process.env.MONGODB_URI ? '✅ Cloud' : '⚠️  Local'})`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('\nShutting down gracefully...');
+  await closeDatabase();
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('\nShutting down gracefully...');
+  await closeDatabase();
+  process.exit(0);
 });
