@@ -563,6 +563,18 @@ app.get('/api/scoreboard', authenticate, (req, res) => {
   res.json(data.scoreboard);
 });
 
+// DOWNLOAD DATA ENDPOINT
+app.get('/api/download-data', authenticate, (req, res) => {
+  const data = readData();
+
+  // Set headers to trigger download
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', `attachment; filename="data-backup-${new Date().toISOString().split('T')[0]}.json"`);
+
+  // Send the data as a formatted JSON file
+  res.send(JSON.stringify(data, null, 2));
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
   console.log(`Data file: ${DATA_FILE}`);
