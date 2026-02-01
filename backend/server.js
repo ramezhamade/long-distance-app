@@ -184,10 +184,15 @@ function calculateWinner(game, dateKey, data) {
 
   let winner = null;
   if (game === 'wordle') {
-    if (r1.guesses < r2.guesses) winner = p1;
+    // If one won and one lost, winner wins
+    if (r1.won && !r2.won) winner = p1;
+    else if (r2.won && !r1.won) winner = p2;
+    // If both won or both lost, fewer guesses wins
+    else if (r1.guesses < r2.guesses) winner = p1;
     else if (r2.guesses < r1.guesses) winner = p2;
     else winner = 'tie';
   } else if (game === 'connections') {
+    // Fewer mistakes wins (if both completed)
     if (r1.mistakes < r2.mistakes) winner = p1;
     else if (r2.mistakes < r1.mistakes) winner = p2;
     else winner = 'tie';

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -83,7 +83,6 @@ function WordleGame({ getAuthHeaders }) {
 
     const upperGuess = currentGuess.toUpperCase();
 
-    // Validate that the guess is a valid word
     if (!validWords.includes(upperGuess)) {
       setMessage('Not a valid word');
       return;
@@ -126,7 +125,8 @@ function WordleGame({ getAuthHeaders }) {
     }
   };
 
-  const handleKeyPress = (e) => {
+  // Use useCallback to memoize the key handler and prevent double-firing
+  const handleKeyPress = useCallback((e) => {
     if (gameState !== 'playing') return;
 
     if (e.key === 'Enter') {
@@ -134,16 +134,21 @@ function WordleGame({ getAuthHeaders }) {
     } else if (e.key === 'Backspace') {
       setCurrentGuess(prev => prev.slice(0, -1));
       setMessage('');
-    } else if (/^[a-zA-Z]$/.test(e.key) && currentGuess.length < 5) {
-      setCurrentGuess(prev => prev + e.key.toUpperCase());
+    } else if (/^[a-zA-Z]$/.test(e.key)) {
+      setCurrentGuess(prev => {
+        if (prev.length >= 5) return prev;
+        return prev + e.key.toUpperCase();
+      });
       setMessage('');
     }
-  };
+  }, [gameState]);
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentGuess, gameState, guesses, validWords]);
+    if (gameState === 'playing') {
+      window.addEventListener('keydown', handleKeyPress);
+      return () => window.removeEventListener('keydown', handleKeyPress);
+    }
+  }, [gameState, handleKeyPress]);
 
   if (gameState === 'loading') {
     return <div className="game-loading">Loading puzzle...</div>;
