@@ -125,30 +125,14 @@ function WordleGame({ getAuthHeaders }) {
     }
   };
 
-  // Use useCallback to memoize the key handler and prevent double-firing
-  const handleKeyPress = useCallback((e) => {
+  const handleKeyDown = (e) => {
     if (gameState !== 'playing') return;
 
     if (e.key === 'Enter') {
+      e.preventDefault();
       handleSubmitGuess();
-    } else if (e.key === 'Backspace') {
-      setCurrentGuess(prev => prev.slice(0, -1));
-      setMessage('');
-    } else if (/^[a-zA-Z]$/.test(e.key)) {
-      setCurrentGuess(prev => {
-        if (prev.length >= 5) return prev;
-        return prev + e.key.toUpperCase();
-      });
-      setMessage('');
     }
-  }, [gameState]);
-
-  useEffect(() => {
-    if (gameState === 'playing') {
-      window.addEventListener('keydown', handleKeyPress);
-      return () => window.removeEventListener('keydown', handleKeyPress);
-    }
-  }, [gameState, handleKeyPress]);
+  };
 
   if (gameState === 'loading') {
     return <div className="game-loading">Loading puzzle...</div>;
@@ -195,7 +179,11 @@ function WordleGame({ getAuthHeaders }) {
           <input
             type="text"
             value={currentGuess}
-            onChange={(e) => setCurrentGuess(e.target.value.toUpperCase().slice(0, 5))}
+            onChange={(e) => {
+              setCurrentGuess(e.target.value.toUpperCase().slice(0, 5));
+              setMessage('');
+            }}
+            onKeyDown={handleKeyDown}
             maxLength={5}
             placeholder="Type your guess..."
             autoFocus

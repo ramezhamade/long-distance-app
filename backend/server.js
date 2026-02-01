@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 5001;
 
 // Simple authentication - Change these credentials!
 const AUTH_USERNAME = 'kingramez';
-const AUTH_PASSWORD = 'takemewheneveryouneed';
+const AUTH_PASSWORD = 'Layan';
 
 app.use(cors());
 app.use(bodyParser.json());

@@ -1034,6 +1034,7 @@
 .question-text {
   font-size: 1.5rem;
   margin-bottom: 2rem;
+  color: #333;
 }
 
 .answer-buttons {
@@ -1126,6 +1127,7 @@
   font-size: 1.1rem;
   font-weight: 500;
   margin: 1rem 0;
+  color: #333;
 }
 
 .history-answers {
@@ -1233,4 +1235,30 @@
 .game-loading {
   text-align: center;
   padding: 3rem;
+  color: #ffffff;
+}
+
+.game-error {
+  text-align: center;
+  padding: 3rem;
+  color: #ffffff;
+}
+
+/* Make text lighter on Who's More Likely and Stats tabs */
+.who-more-likely > h2,
+.who-more-likely > p,
+.scoreboard > h2,
+.scoreboard > p {
+  color: #ffffff;
+}
+
+.my-answer,
+.opponent-answer,
+.waiting-opponent,
+.waiting {
+  color: #333;
+}
+
+.game-instructions {
+  color: #666;
 }
