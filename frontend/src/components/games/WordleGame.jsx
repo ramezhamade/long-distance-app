@@ -83,10 +83,7 @@ function WordleGame({ getAuthHeaders }) {
 
     const upperGuess = currentGuess.toUpperCase();
 
-    if (!validWords.includes(upperGuess)) {
-      setMessage('Not a valid word');
-      return;
-    }
+    // Allow any 5-letter word as a guess
 
     const evaluation = evaluateGuess(upperGuess, targetWord);
     const newGuesses = [...guesses, upperGuess];
