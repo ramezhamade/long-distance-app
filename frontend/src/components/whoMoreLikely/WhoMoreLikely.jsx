@@ -11,10 +11,13 @@ function WhoMoreLikely({ getAuthHeaders, playerName }) {
   const [bothAnswered, setBothAnswered] = useState(false);
   const [allAnswered, setAllAnswered] = useState(false);
   const [error, setError] = useState(null);
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     if (playerName) {
       fetchNextQuestion();
+      fetchHistory();
     }
   }, [playerName]);
 
@@ -44,6 +47,19 @@ function WhoMoreLikely({ getAuthHeaders, playerName }) {
     }
   };
 
+  const fetchHistory = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/who-more-likely/history`, {
+        headers: getAuthHeaders(),
+      });
+      // Filter to only show disagreements
+      const disagreements = response.data.filter(item => item.disagreed);
+      setHistory(disagreements);
+    } catch (error) {
+      console.error('Error fetching history:', error);
+    }
+  };
+
   const handleAnswer = async (answer) => {
     try {
       await axios.post(`${API_URL}/who-more-likely/answer`, {
@@ -56,6 +72,7 @@ function WhoMoreLikely({ getAuthHeaders, playerName }) {
       setMyAnswer(answer);
       // Fetch again to check if opponent also answered
       await fetchNextQuestion();
+      await fetchHistory(); // Refresh history
     } catch (error) {
       console.error('Error submitting answer:', error);
     }
@@ -82,11 +99,32 @@ function WhoMoreLikely({ getAuthHeaders, playerName }) {
   if (allAnswered) {
     return (
       <div className="who-more-likely">
-        <h2>🤔 Who's More Likely To</h2>
+        <h2>Who's More Likely To</h2>
         <div className="all-answered">
           <h3>🎉 You've answered all questions!</h3>
           <p>More questions coming soon...</p>
         </div>
+        
+        {history.length > 0 && (
+          <div className="history-section">
+            <h3>Questions You Disagreed On ({history.length})</h3>
+            <div className="history-list">
+              {history.map((item) => (
+                <div key={item.question.id} className="history-item">
+                  <div className={`category-badge ${item.question.category}`}>
+                    {item.question.category}
+                  </div>
+                  <p className="history-question">{item.question.text}</p>
+                  <div className="history-answers">
+                    <span className="history-answer">Ramez: <strong>{item.responses.Ramez}</strong></span>
+                    <span className="vs">vs</span>
+                    <span className="history-answer">Layan: <strong>{item.responses.Layan}</strong></span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -103,7 +141,7 @@ function WhoMoreLikely({ getAuthHeaders, playerName }) {
 
   return (
     <div className="who-more-likely">
-      <h2>🤔 Who's More Likely To</h2>
+      <h2>Who's More Likely To</h2>
 
       <div className="question-card">
         <div className={`category-badge ${currentQuestion.category}`}>
@@ -166,6 +204,35 @@ function WhoMoreLikely({ getAuthHeaders, playerName }) {
           </div>
         )}
       </div>
+
+      {history.length > 0 && (
+        <div className="history-section">
+          <button 
+            className="toggle-history-btn" 
+            onClick={() => setShowHistory(!showHistory)}
+          >
+            {showHistory ? '▼' : '▶'} Questions You Disagreed On ({history.length})
+          </button>
+          
+          {showHistory && (
+            <div className="history-list">
+              {history.map((item) => (
+                <div key={item.question.id} className="history-item">
+                  <div className={`category-badge ${item.question.category}`}>
+                    {item.question.category}
+                  </div>
+                  <p className="history-question">{item.question.text}</p>
+                  <div className="history-answers">
+                    <span className="history-answer">Ramez: <strong>{item.responses.Ramez}</strong></span>
+                    <span className="vs">vs</span>
+                    <span className="history-answer">Layan: <strong>{item.responses.Layan}</strong></span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

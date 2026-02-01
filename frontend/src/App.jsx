@@ -176,7 +176,7 @@ function App() {
       )}
 
       <header className="app-header">
-        <h1>🎮 The Lamez Hub 🎮</h1>
+        <h1>The Lamez Hub</h1>
         <p>Where Ramez & Layan connect across the miles</p>
         <div className="header-actions">
           {playerName && <span className="current-player">Playing as: {playerName}</span>}

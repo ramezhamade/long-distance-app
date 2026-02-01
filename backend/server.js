@@ -396,6 +396,29 @@ app.post('/api/who-more-likely/answer', authenticate, (req, res) => {
   res.json({ success: true });
 });
 
+// Get history of answered questions with responses
+app.get('/api/who-more-likely/history', authenticate, (req, res) => {
+  const data = readData();
+  const history = [];
+
+  // Get all questions that have been answered by both players
+  data.whoMoreLikely.questions.forEach(question => {
+    const responses = data.whoMoreLikely.responses[question.id];
+    if (responses && responses['Ramez'] && responses['Layan']) {
+      history.push({
+        question,
+        responses: {
+          Ramez: responses['Ramez'],
+          Layan: responses['Layan']
+        },
+        disagreed: responses['Ramez'] !== responses['Layan']
+      });
+    }
+  });
+
+  res.json(history);
+});
+
 // SCOREBOARD ENDPOINT
 app.get('/api/scoreboard', authenticate, (req, res) => {
   const data = readData();
