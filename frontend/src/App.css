@@ -783,10 +783,20 @@
   margin: 0 auto;
 }
 
+.games-hub h2 {
+  color: white;
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
 .games-subtitle {
   text-align: center;
-  color: #666;
+  color: white;
   margin-bottom: 2rem;
+  font-size: 1.2rem;
+  font-style: italic;
 }
 
 .game-cards {

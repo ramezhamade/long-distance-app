@@ -29,8 +29,8 @@ function GamesHub({ getAuthHeaders }) {
 
   return (
     <div className="games-hub">
-      <h2>🎮 Daily Games</h2>
-      <p className="games-subtitle">Play together and compete!</p>
+      <h2>Games</h2>
+      <p className="games-subtitle">No mercy</p>
 
       <div className="game-cards">
         <div className="game-card" onClick={() => setSelectedGame('wordle')}>
