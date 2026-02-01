@@ -3,35 +3,27 @@ const wordleWords = [
   // Sweet & Romantic
   'HEART', 'LOVED', 'SWEET', 'MARRY', 'BLISS', 'CHARM', 'TRUST',
   'FLAME', 'ROSES', 'SMILE', 'DREAM', 'HONEY', 'ANGEL', 'CUPID', 'SWOON',
-  'CRUSH', 'HAPPY', 'LAUGH', 'GRACE', 'PEACE', 'MAGIC', 'LIGHT', 'STARS', 'LOYAL', 'ADORE',
-  'BOND', 'CLOSE', 'COZY', 'SOFT', 'WARM', 'SPARK', 'PRIDE', 'HOPE',
-  'LOVE', 'BABE', 'BABY', 'CUTE', 'MINE', 'SOUL', 'DEEP', 'TRUE',
+  'CRUSH', 'HAPPY', 'LAUGH', 'GRACE', 'PEACE', 'MAGIC', 'LIGHT', 'STARS', 'LOYAL', 'ADORE', 'SPARK', 'PRIDE',
 
   // Communication & Connection
-  'PHONE', 'TEXTS', 'VIDEO', 'VISIT', 'HUGS', 'DATES',
+  'PHONE', 'TEXTS', 'VIDEO', 'VISIT','DATES',
   'CALLS', 'CHATS', 'FLIRT', 'TEASE', 'WINKS',
 
   // Physical & Intimate
-  'KISS', 'TOUCH', 'CHEEK', 'LIPS', 'HANDS', 'ARMS', 'EYES', 'VOICE',
-  'CHEST', 'WAIST', 'NECK', 'THIGH', 'CURVES', 'BODY',
-
+  'TOUCH', 'CHEEK',  'HANDS', 'VOICE', 'CHEST', 'WAIST', 'THIGH', 'CURVES',
   // Activities & Places
   'GIFT', 'WINE', 'DANCE', 'MUSIC', 'DINE', 'WALK', 'BEACH',
   'MOON', 'NIGHT', 'PARIS', 'HOTEL', 'PARTY', 'DRUNK', 'SHOTS',
 
   // Wedding & Commitment
-  'PHOTO', 'RING', 'VOWS', 'BRIDE', 'GROOM', 'UNITY',
-  'ALTAR', 'AISLE', 'DRESS', 'VEIL',
+  'PHOTO', 'RINGS', 'BRIDE', 'GROOM', 'UNITY',
+  'ALTAR', 'AISLE', 'DRESS',
 
   // Raunchy & Spicy
   'HORNY', 'DIRTY', 'NAUGHTY', 'SPICY', 'KINKY', 'NAKED', 'STRIP',
-  'MOANS', 'PANTS', 'SHIRT', 'SKIRT', 'TIGHT', 'GRAB',
-  'ROUGH', 'WILD', 'TEASE', 'TEMPT', 'DESIRE', 'LUST', 'CRAVE',
-  'SEDUCE', 'FLIRTY', 'STEAMY', 'HEATED',
-
-  // Emotions & States
-  'BLUSH', 'GIDDY', 'SILLY', 'GOOFY', 'CRAZY', 'LUCKY',
-  'MISSES', 'NEEDS', 'WANTS', 'ACHES', 'LONGS', 'WAITS',
+  'MOANS', 'PANTS', 'SHIRT', 'SKIRT', 'TIGHT',
+  'ROUGH', 'TEASE', 'TEMPT', 'DESIRE', 'HORNY', 'CRAVE',
+  'SEDUCE', 'FLIRTY', 'STEAMY', 'HEATED','BOOBS', 'HANDS', 'THIGH', 'BALLS', 'HORNY', 
 
   // Time & Moments
   'TODAY', 'LATER', 'EARLY', 'SLEEP', 'AWAKE', 'SNEAK',

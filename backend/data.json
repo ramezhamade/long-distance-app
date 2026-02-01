@@ -13,6 +13,13 @@
       "date": "2026-06-20T12:00",
       "description": "",
       "createdAt": "2026-01-31T13:06:08.887Z"
+    },
+    {
+      "id": "1769954945090",
+      "title": "Valentines Day",
+      "date": "2026-02-14T12:00",
+      "description": "",
+      "createdAt": "2026-02-01T14:09:05.090Z"
     }
   ],
   "statistics": {
@@ -333,25 +340,25 @@
     "byGame": {
       "wordle": {
         "Ramez": {
-          "wins": 0,
+          "wins": 1,
           "losses": 0,
           "avgGuesses": 0
         },
         "Layan": {
           "wins": 0,
-          "losses": 0,
+          "losses": 1,
           "avgGuesses": 0
         }
       },
       "connections": {
         "Ramez": {
-          "wins": 0,
+          "wins": 1,
           "losses": 0,
           "avgMistakes": 0
         },
         "Layan": {
           "wins": 0,
-          "losses": 0,
+          "losses": 1,
           "avgMistakes": 0
         }
       }

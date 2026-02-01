@@ -6,11 +6,16 @@ const whoMoreLikelyQuestions = {
     "Who's more likely to send a spicy text first?",
     "Who's more likely to suggest trying something new?",
     "Who's more likely to get turned on by a simple touch?",
+    "Who's most likely to finish first?"
     "Who's more likely to wake you up for some action?",
-    "Who's more likely to be louder?",
+    "Who's more likely to be louder in bed?",
     "Who's more likely to take charge?",
     "Who's more likely to tease the other?",
     "Who's more likely to get caught staring?",
+    "Who's more likely to tap out first?",
+    "Who's most likely to send nudes?",
+    "Who's most likely to get turned on faster?",
+    
   ],
   funny: [
     "Who's more likely to fall asleep during a movie?",
@@ -19,10 +24,12 @@ const whoMoreLikelyQuestions = {
     "Who's more likely to laugh at their own jokes?",
     "Who's more likely to snore louder?",
     "Who's more likely to eat the last slice without asking?",
-    "Who's more likely to sing in the shower?",
     "Who's more likely to talk to themselves?",
     "Who's more likely to cry during a sad movie?",
     "Who's more likely to make weird faces in photos?",
+    "Who's more likely to lie about wanting to do something?",
+    "Who's most likely to wear the pants in the relationship?",
+    "Who's most likely to pay for Dinners?",
   ],
   roasty: [
     "Who's more likely to forget our anniversary?",
