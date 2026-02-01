@@ -32,10 +32,20 @@
           "date": "2026-1-31",
           "results": {}
         }
+      },
+      "currentPuzzleId": 0,
+      "puzzles": {
+        "0": {
+          "word": "HEART",
+          "puzzleId": 0,
+          "results": {}
+        }
       }
     },
     "connections": {
-      "dailyPuzzles": {}
+      "dailyPuzzles": {},
+      "currentPuzzleId": 0,
+      "puzzles": {}
     }
   },
   "whoMoreLikely": {
