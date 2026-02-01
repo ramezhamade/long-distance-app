@@ -43,59 +43,50 @@ function Scoreboard({ getAuthHeaders }) {
     );
   }
 
-  const { overall, byGame } = scoreboard;
+  const { byGame } = scoreboard;
 
   return (
     <div className="scoreboard">
-      <h2>📊 Scoreboard</h2>
+      <h2>📊 Game Stats</h2>
 
-      <div className="overall-stats">
-        <h3>Overall Stats</h3>
-        <div className="player-stats-grid">
-          {Object.entries(overall).map(([player, stats]) => (
-            <div key={player} className="player-stat-card">
-              <h4>{player}</h4>
-              <div className="stats-row">
-                <div className="stat">
-                  <span className="stat-value wins">{stats.wins}</span>
-                  <span className="stat-label">Wins</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-value losses">{stats.losses}</span>
-                  <span className="stat-label">Losses</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-value ties">{stats.ties}</span>
-                  <span className="stat-label">Ties</span>
-                </div>
-              </div>
+      <div className="game-stats-container">
+        {/* Wordle Stats */}
+        <div className="game-stat-card">
+          <h3>🟩 Wordle</h3>
+          <div className="stats-table">
+            <div className="stats-header">
+              <span>Player</span>
+              <span className="stat-col wins-col">Wins</span>
+              <span className="stat-col ties-col">Ties</span>
+              <span className="stat-col losses-col">Losses</span>
             </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="game-stats">
-        <h3>By Game</h3>
-
-        <div className="game-stat-section">
-          <h4>🟩 Wordle</h4>
-          <div className="player-stats-grid">
             {Object.entries(byGame.wordle).map(([player, stats]) => (
-              <div key={player} className="game-stat-card">
-                <h5>{player}</h5>
-                <p>{stats.wins}W - {stats.losses}L</p>
+              <div key={player} className="stats-row">
+                <span className="player-name">{player}</span>
+                <span className="stat-col stat-wins">{stats.wins}</span>
+                <span className="stat-col stat-ties">{stats.ties || 0}</span>
+                <span className="stat-col stat-losses">{stats.losses}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="game-stat-section">
-          <h4>🔗 Connections</h4>
-          <div className="player-stats-grid">
+        {/* Connections Stats */}
+        <div className="game-stat-card">
+          <h3>🔗 Connections</h3>
+          <div className="stats-table">
+            <div className="stats-header">
+              <span>Player</span>
+              <span className="stat-col wins-col">Wins</span>
+              <span className="stat-col ties-col">Ties</span>
+              <span className="stat-col losses-col">Losses</span>
+            </div>
             {Object.entries(byGame.connections).map(([player, stats]) => (
-              <div key={player} className="game-stat-card">
-                <h5>{player}</h5>
-                <p>{stats.wins}W - {stats.losses}L</p>
+              <div key={player} className="stats-row">
+                <span className="player-name">{player}</span>
+                <span className="stat-col stat-wins">{stats.wins}</span>
+                <span className="stat-col stat-ties">{stats.ties || 0}</span>
+                <span className="stat-col stat-losses">{stats.losses}</span>
               </div>
             ))}
           </div>

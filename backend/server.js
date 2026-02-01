@@ -148,29 +148,42 @@ const connectionsPuzzles = require('./gameContent/connectionsPuzzles');
 const whoMoreLikelyQuestions = require('./gameContent/whoMoreLikelyQuestions');
 
 // Helper functions
-function getTodayDate() {
-  const today = new Date();
-  return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+function initializeGameData(data) {
+  if (!data.games) data.games = {};
+  if (!data.games.wordle) data.games.wordle = {};
+  if (!data.games.connections) data.games.connections = {};
+
+  // Initialize current puzzle IDs
+  if (data.games.wordle.currentPuzzleId === undefined) {
+    data.games.wordle.currentPuzzleId = 0;
+  }
+  if (data.games.connections.currentPuzzleId === undefined) {
+    data.games.connections.currentPuzzleId = 0;
+  }
+
+  // Initialize puzzles storage
+  if (!data.games.wordle.puzzles) {
+    data.games.wordle.puzzles = {};
+  }
+  if (!data.games.connections.puzzles) {
+    data.games.connections.puzzles = {};
+  }
 }
 
-function getDailyWord(date) {
-  const [year, month, day] = date.split('-').map(Number);
-  const seed = year * 10000 + month * 100 + day;
-  return wordleWords[seed % wordleWords.length];
+function getWordByPuzzleId(puzzleId) {
+  return wordleWords[puzzleId % wordleWords.length];
 }
 
-function getDailyPuzzle(date) {
-  const [year, month, day] = date.split('-').map(Number);
-  const seed = year * 10000 + month * 100 + day;
-  return connectionsPuzzles[seed % connectionsPuzzles.length];
+function getPuzzleByPuzzleId(puzzleId) {
+  return connectionsPuzzles[puzzleId % connectionsPuzzles.length];
 }
 
 function getPlayerName(req) {
   return req.headers['x-player-name'] || 'Unknown';
 }
 
-function calculateWinner(game, dateKey, data) {
-  const puzzle = data.games[game].dailyPuzzles[dateKey];
+function calculateWinner(game, puzzleId, data) {
+  const puzzle = data.games[game].puzzles[puzzleId];
   if (!puzzle || !puzzle.results) return;
 
   const players = Object.keys(puzzle.results);
@@ -207,37 +220,51 @@ function calculateWinner(game, dateKey, data) {
     data.scoreboard.overall[loser].losses++;
     data.scoreboard.byGame[game][winner].wins++;
     data.scoreboard.byGame[game][loser].losses++;
+    // Add ties to scoreboard structure
+    if (!data.scoreboard.byGame[game][winner].ties) data.scoreboard.byGame[game][winner].ties = 0;
+    if (!data.scoreboard.byGame[game][loser].ties) data.scoreboard.byGame[game][loser].ties = 0;
   } else if (winner === 'tie') {
     data.scoreboard.overall[p1].ties++;
     data.scoreboard.overall[p2].ties++;
+    if (!data.scoreboard.byGame[game][p1].ties) data.scoreboard.byGame[game][p1].ties = 0;
+    if (!data.scoreboard.byGame[game][p2].ties) data.scoreboard.byGame[game][p2].ties = 0;
+    data.scoreboard.byGame[game][p1].ties++;
+    data.scoreboard.byGame[game][p2].ties++;
+  }
+
+  // If both players completed, advance to next puzzle
+  if (r1.completed && r2.completed) {
+    data.games[game].currentPuzzleId++;
   }
 }
 
 // WORDLE ENDPOINTS
 app.get('/api/games/wordle/today', authenticate, (req, res) => {
   const data = readData();
-  const dateKey = getTodayDate();
-  const word = getDailyWord(dateKey);
+  initializeGameData(data);
+
+  const puzzleId = data.games.wordle.currentPuzzleId;
+  const word = getWordByPuzzleId(puzzleId);
   const playerName = getPlayerName(req);
 
-  if (!data.games.wordle.dailyPuzzles[dateKey]) {
-    data.games.wordle.dailyPuzzles[dateKey] = {
+  if (!data.games.wordle.puzzles[puzzleId]) {
+    data.games.wordle.puzzles[puzzleId] = {
       word,
-      date: dateKey,
+      puzzleId,
       results: {}
     };
     writeData(data);
   }
 
-  const puzzle = data.games.wordle.dailyPuzzles[dateKey];
+  const puzzle = data.games.wordle.puzzles[puzzleId];
   const myResult = puzzle.results[playerName];
   const otherPlayer = playerName === 'Ramez' ? 'Layan' : 'Ramez';
   const otherResult = puzzle.results[otherPlayer];
 
   res.json({
-    date: dateKey,
-    word: word, // Send the word so frontend can validate
-    validWords: wordleWords, // Send valid words list for validation
+    puzzleId,
+    word: word,
+    validWords: wordleWords,
     myResult: myResult || null,
     opponentResult: otherResult && otherResult.completed ? otherResult : null,
     winner: puzzle.winner || null
@@ -246,15 +273,17 @@ app.get('/api/games/wordle/today', authenticate, (req, res) => {
 
 app.post('/api/games/wordle/submit', authenticate, (req, res) => {
   const data = readData();
-  const dateKey = getTodayDate();
+  initializeGameData(data);
+
+  const puzzleId = data.games.wordle.currentPuzzleId;
   const playerName = getPlayerName(req);
   const { guesses, won, attempts } = req.body;
 
-  if (!data.games.wordle.dailyPuzzles[dateKey]) {
-    return res.status(400).json({ error: 'No puzzle for today' });
+  if (!data.games.wordle.puzzles[puzzleId]) {
+    return res.status(400).json({ error: 'No active puzzle' });
   }
 
-  data.games.wordle.dailyPuzzles[dateKey].results[playerName] = {
+  data.games.wordle.puzzles[puzzleId].results[playerName] = {
     guesses,
     won,
     attempts,
@@ -262,7 +291,7 @@ app.post('/api/games/wordle/submit', authenticate, (req, res) => {
     timestamp: new Date().toISOString()
   };
 
-  calculateWinner('wordle', dateKey, data);
+  calculateWinner('wordle', puzzleId, data);
   writeData(data);
 
   res.json({ success: true });
@@ -271,50 +300,54 @@ app.post('/api/games/wordle/submit', authenticate, (req, res) => {
 // CONNECTIONS ENDPOINTS
 app.get('/api/games/connections/today', authenticate, (req, res) => {
   const data = readData();
-  const dateKey = getTodayDate();
-  const puzzle = getDailyPuzzle(dateKey);
+  initializeGameData(data);
+
+  const puzzleId = data.games.connections.currentPuzzleId;
+  const puzzle = getPuzzleByPuzzleId(puzzleId);
   const playerName = getPlayerName(req);
 
-  if (!data.games.connections.dailyPuzzles[dateKey]) {
-    data.games.connections.dailyPuzzles[dateKey] = {
+  if (!data.games.connections.puzzles[puzzleId]) {
+    data.games.connections.puzzles[puzzleId] = {
       groups: puzzle.groups,
-      date: dateKey,
+      puzzleId,
       results: {}
     };
     writeData(data);
   }
 
-  const dailyPuzzle = data.games.connections.dailyPuzzles[dateKey];
-  const myResult = dailyPuzzle.results[playerName];
+  const currentPuzzle = data.games.connections.puzzles[puzzleId];
+  const myResult = currentPuzzle.results[playerName];
   const otherPlayer = playerName === 'Ramez' ? 'Layan' : 'Ramez';
-  const otherResult = dailyPuzzle.results[otherPlayer];
+  const otherResult = currentPuzzle.results[otherPlayer];
 
   res.json({
-    date: dateKey,
-    groups: dailyPuzzle.groups,
+    puzzleId,
+    groups: currentPuzzle.groups,
     myResult: myResult || null,
     opponentResult: otherResult && otherResult.completed ? otherResult : null,
-    winner: dailyPuzzle.winner || null
+    winner: currentPuzzle.winner || null
   });
 });
 
 app.post('/api/games/connections/submit', authenticate, (req, res) => {
   const data = readData();
-  const dateKey = getTodayDate();
+  initializeGameData(data);
+
+  const puzzleId = data.games.connections.currentPuzzleId;
   const playerName = getPlayerName(req);
   const { mistakes, completed } = req.body;
 
-  if (!data.games.connections.dailyPuzzles[dateKey]) {
-    return res.status(400).json({ error: 'No puzzle for today' });
+  if (!data.games.connections.puzzles[puzzleId]) {
+    return res.status(400).json({ error: 'No active puzzle' });
   }
 
-  data.games.connections.dailyPuzzles[dateKey].results[playerName] = {
+  data.games.connections.puzzles[puzzleId].results[playerName] = {
     mistakes,
     completed,
     timestamp: new Date().toISOString()
   };
 
-  calculateWinner('connections', dateKey, data);
+  calculateWinner('connections', puzzleId, data);
   writeData(data);
 
   res.json({ success: true });
