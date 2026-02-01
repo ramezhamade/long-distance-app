@@ -1,22 +1,5 @@
 // Who's More Likely questions - raunchy, funny, roasty, and sweet
 const whoMoreLikelyQuestions = {
-  raunchy: [
-    "Who's more likely to make the first move?",
-    "Who's more likely to initiate in the bedroom?",
-    "Who's more likely to send a spicy text first?",
-    "Who's more likely to suggest trying something new?",
-    "Who's more likely to get turned on by a simple touch?",
-    "Who's most likely to finish first?",
-    "Who's more likely to wake you up for some action?",
-    "Who's more likely to be louder in bed?",
-    "Who's more likely to take charge?",
-    "Who's more likely to tease the other?",
-    "Who's more likely to get caught staring?",
-    "Who's more likely to tap out first?",
-    "Who's most likely to send nudes?",
-    "Who's most likely to get turned on faster?",
-    
-  ],
   funny: [
     "Who's more likely to fall asleep during a movie?",
     "Who's more likely to forget where they put their phone?",
