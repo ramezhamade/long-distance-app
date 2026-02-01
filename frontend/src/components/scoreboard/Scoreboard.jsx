@@ -9,7 +9,15 @@ function Scoreboard({ getAuthHeaders }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Fetch scoreboard when component mounts or becomes visible
     fetchScoreboard();
+
+    // Set up interval to refresh every 10 seconds
+    const interval = setInterval(() => {
+      fetchScoreboard();
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchScoreboard = async () => {
@@ -47,7 +55,12 @@ function Scoreboard({ getAuthHeaders }) {
 
   return (
     <div className="scoreboard">
-      <h2>📊 Game Stats</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h2>📊 Game Stats</h2>
+        <button onClick={fetchScoreboard} className="refresh-button" title="Refresh stats">
+          🔄 Refresh
+        </button>
+      </div>
 
       <div className="game-stats-container">
         {/* Wordle Stats */}

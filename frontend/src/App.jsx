@@ -44,6 +44,18 @@ function App() {
     }
   }, [isAuthenticated, authToken]);
 
+  // Auto-refresh data when on home tab
+  useEffect(() => {
+    if (isAuthenticated && authToken && activeTab === 'home') {
+      const interval = setInterval(() => {
+        fetchEvents();
+        fetchStatistics();
+      }, 10000); // Refresh every 10 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated, authToken, activeTab]);
+
   const getAuthHeaders = () => {
     const headers = {
       Authorization: `Basic ${authToken}`,

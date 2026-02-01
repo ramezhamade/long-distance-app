@@ -605,6 +605,23 @@
   color: #667eea;
 }
 
+.refresh-button {
+  background: #667eea;
+  color: white;
+  border: 2px solid #667eea;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.refresh-button:hover {
+  background: #5568d3;
+  border-color: #5568d3;
+  transform: rotate(180deg);
+}
+
 @media (max-width: 768px) {
   .login-card {
     padding: 2rem;
