@@ -55,7 +55,15 @@ function authenticate(req, res, next) {
   }
 }
 
-const DATA_FILE = path.join(__dirname, 'data.json');
+// Use persistent directory from environment variable or default to current directory
+// On Render, set DATA_DIR to /opt/render/project/data for persistent storage
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+const DATA_FILE = path.join(DATA_DIR, 'data.json');
+
+// Ensure data directory exists
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
 
 function readData() {
   try {
@@ -73,12 +81,18 @@ function readData() {
       if (!parsed.whoMoreLikely.questions) parsed.whoMoreLikely.questions = [];
       if (!parsed.whoMoreLikely.responses) parsed.whoMoreLikely.responses = {};
 
+      console.log(`[${new Date().toISOString()}] Data loaded from ${DATA_FILE}`);
       return parsed;
+    } else {
+      console.log(`[${new Date().toISOString()}] Data file not found, creating new one at ${DATA_FILE}`);
     }
   } catch (error) {
     console.error('Error reading data:', error);
+    console.error('DATA_FILE:', DATA_FILE);
   }
-  return {
+
+  // Return default data and save it
+  const defaultData = {
     events: [],
     statistics: {
       relationshipStart: null,
@@ -88,15 +102,47 @@ function readData() {
     whoMoreLikely: {
       questions: [],
       responses: {}
+    },
+    games: {
+      wordle: {
+        currentPuzzleId: 0,
+        puzzles: {}
+      },
+      connections: {
+        currentPuzzleId: 0,
+        puzzles: {}
+      }
+    },
+    scoreboard: {
+      overall: {
+        Ramez: { wins: 0, losses: 0, ties: 0 },
+        Layan: { wins: 0, losses: 0, ties: 0 }
+      },
+      byGame: {
+        wordle: {
+          Ramez: { wins: 0, losses: 0, ties: 0 },
+          Layan: { wins: 0, losses: 0, ties: 0 }
+        },
+        connections: {
+          Ramez: { wins: 0, losses: 0, ties: 0 },
+          Layan: { wins: 0, losses: 0, ties: 0 }
+        }
+      }
     }
   };
+
+  writeData(defaultData);
+  return defaultData;
 }
 
 function writeData(data) {
   try {
     fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+    console.log(`[${new Date().toISOString()}] Data saved to ${DATA_FILE}`);
   } catch (error) {
     console.error('Error writing data:', error);
+    console.error('DATA_FILE:', DATA_FILE);
+    console.error('DATA_DIR:', DATA_DIR);
   }
 }
 
@@ -532,4 +578,7 @@ app.get('/api/scoreboard', authenticate, (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Data directory: ${DATA_DIR}`);
+  console.log(`Data file: ${DATA_FILE}`);
+  console.log(`Data persistence: ${DATA_DIR === __dirname ? '⚠️  Ephemeral (local dev)' : '✅ Persistent disk'}`);
 });
