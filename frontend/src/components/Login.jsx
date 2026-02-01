@@ -78,11 +78,6 @@ function Login({ onLogin }) {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-
-        <p className="login-footer">
-          Ramez: <strong>ramez</strong> / <strong>ramez123</strong><br />
-          Layan: <strong>layan</strong> / <strong>Layan</strong>
-        </p>
       </div>
     </div>
   );
