@@ -805,12 +805,16 @@ app.post('/api/who-more-likely/answer', authenticate, async (req, res) => {
   const playerName = getPlayerName(req);
   const { questionId, answer } = req.body;
 
+  console.log(`[WML Answer] Player: ${playerName}, Question: ${questionId}, Answer: ${answer}, USE_SUPABASE: ${USE_SUPABASE}`);
+
   if (USE_SUPABASE) {
     try {
-      const { error } = await supabase.from('wml_responses').upsert(
+      console.log('[WML Answer] Attempting Supabase upsert...');
+      const { error, data } = await supabase.from('wml_responses').upsert(
         [{ question_id: questionId, player_name: playerName, answer, timestamp: new Date().toISOString() }],
         { onConflict: 'question_id,player_name' }
-      );
+      ).select();
+      console.log('[WML Answer] Upsert result - error:', error, 'data:', data);
       if (error) {
         console.error('Error upserting wml response:', error);
         throw error;
