@@ -7,8 +7,9 @@ function WordleGame({ getAuthHeaders }) {
   const [gameState, setGameState] = useState('loading');
   const [currentGuess, setCurrentGuess] = useState('');
   const [guesses, setGuesses] = useState([]);
-  const [evaluations, setEvaluations] = useState([]); // Store color feedback for each guess
+  const [evaluations, setEvaluations] = useState([]);
   const [targetWord, setTargetWord] = useState('');
+  const [validWords, setValidWords] = useState([]);
   const [myResult, setMyResult] = useState(null);
   const [opponentResult, setOpponentResult] = useState(null);
   const [winner, setWinner] = useState(null);
@@ -25,11 +26,11 @@ function WordleGame({ getAuthHeaders }) {
       });
 
       setTargetWord(response.data.word);
+      setValidWords(response.data.validWords || []);
 
       if (response.data.myResult) {
         setMyResult(response.data.myResult);
         setGuesses(response.data.myResult.attempts || []);
-        // Recalculate evaluations for completed game
         const evals = (response.data.myResult.attempts || []).map(guess =>
           evaluateGuess(guess, response.data.word)
         );
@@ -47,30 +48,26 @@ function WordleGame({ getAuthHeaders }) {
     }
   };
 
-  // Evaluate a guess and return color feedback for each letter
   const evaluateGuess = (guess, word) => {
-    const result = Array(5).fill('absent'); // absent = gray
+    const result = Array(5).fill('absent');
     const wordLetters = word.split('');
     const guessLetters = guess.split('');
     const letterCounts = {};
 
-    // Count letters in the target word
     wordLetters.forEach(letter => {
       letterCounts[letter] = (letterCounts[letter] || 0) + 1;
     });
 
-    // First pass: mark correct positions (green)
     guessLetters.forEach((letter, i) => {
       if (letter === wordLetters[i]) {
-        result[i] = 'correct'; // green
+        result[i] = 'correct';
         letterCounts[letter]--;
       }
     });
 
-    // Second pass: mark present but wrong position (yellow)
     guessLetters.forEach((letter, i) => {
       if (result[i] === 'absent' && letterCounts[letter] > 0) {
-        result[i] = 'present'; // yellow
+        result[i] = 'present';
         letterCounts[letter]--;
       }
     });
@@ -85,8 +82,14 @@ function WordleGame({ getAuthHeaders }) {
     }
 
     const upperGuess = currentGuess.toUpperCase();
-    const evaluation = evaluateGuess(upperGuess, targetWord);
 
+    // Validate that the guess is a valid word
+    if (!validWords.includes(upperGuess)) {
+      setMessage('Not a valid word');
+      return;
+    }
+
+    const evaluation = evaluateGuess(upperGuess, targetWord);
     const newGuesses = [...guesses, upperGuess];
     const newEvaluations = [...evaluations, evaluation];
 
@@ -140,7 +143,7 @@ function WordleGame({ getAuthHeaders }) {
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentGuess, gameState, guesses]);
+  }, [currentGuess, gameState, guesses, validWords]);
 
   if (gameState === 'loading') {
     return <div className="game-loading">Loading puzzle...</div>;

@@ -1,13 +1,104 @@
-// Romantic and relationship-themed 5-letter words for Wordle
+// Romantic, cute, and raunchy 5-letter words for Wordle
 const wordleWords = [
-  'HEART', 'LOVED', 'SWEET', 'KISS', 'MARRY', 'BLISS', 'CHARM', 'TRUST',
+  // Sweet & Romantic
+  'HEART', 'LOVED', 'SWEET', 'MARRY', 'BLISS', 'CHARM', 'TRUST',
   'FLAME', 'ROSES', 'SMILE', 'DREAM', 'HONEY', 'ANGEL', 'CUPID', 'SWOON',
-  'CRUSH', 'HAPPY', 'LAUGH', 'GRACE', 'PEACE', 'PHONE', 'TEXTS', 'VIDEO',
-  'VISIT', 'HUGS', 'DATES', 'MAGIC', 'LIGHT', 'STARS', 'LOYAL', 'ADORE',
-  'BOND', 'CLOSE', 'COZY', 'SOFT', 'WARM', 'GIFT', 'WINE', 'DANCE',
-  'MUSIC', 'DINE', 'WALK', 'BEACH', 'SUNSET', 'MOON', 'NIGHT', 'PARIS',
-  'SPARK', 'TOUCH', 'CHEEK', 'LIPS', 'HANDS', 'ARMS', 'EYES', 'VOICE',
-  'PHOTO', 'RING', 'VOWS', 'BRIDE', 'GROOM', 'UNITY', 'PRIDE', 'HOPE'
+  'CRUSH', 'HAPPY', 'LAUGH', 'GRACE', 'PEACE', 'MAGIC', 'LIGHT', 'STARS', 'LOYAL', 'ADORE',
+  'BOND', 'CLOSE', 'COZY', 'SOFT', 'WARM', 'SPARK', 'PRIDE', 'HOPE',
+  'LOVE', 'BABE', 'BABY', 'CUTE', 'MINE', 'SOUL', 'DEEP', 'TRUE',
+
+  // Communication & Connection
+  'PHONE', 'TEXTS', 'VIDEO', 'VISIT', 'HUGS', 'DATES',
+  'CALLS', 'CHATS', 'FLIRT', 'TEASE', 'WINKS',
+
+  // Physical & Intimate
+  'KISS', 'TOUCH', 'CHEEK', 'LIPS', 'HANDS', 'ARMS', 'EYES', 'VOICE',
+  'CHEST', 'WAIST', 'NECK', 'THIGH', 'CURVES', 'BODY',
+
+  // Activities & Places
+  'GIFT', 'WINE', 'DANCE', 'MUSIC', 'DINE', 'WALK', 'BEACH',
+  'MOON', 'NIGHT', 'PARIS', 'HOTEL', 'PARTY', 'DRUNK', 'SHOTS',
+
+  // Wedding & Commitment
+  'PHOTO', 'RING', 'VOWS', 'BRIDE', 'GROOM', 'UNITY',
+  'ALTAR', 'AISLE', 'DRESS', 'VEIL',
+
+  // Raunchy & Spicy
+  'HORNY', 'DIRTY', 'NAUGHTY', 'SPICY', 'KINKY', 'NAKED', 'STRIP',
+  'MOANS', 'PANTS', 'SHIRT', 'SKIRT', 'TIGHT', 'GRAB',
+  'ROUGH', 'WILD', 'TEASE', 'TEMPT', 'DESIRE', 'LUST', 'CRAVE',
+  'SEDUCE', 'FLIRTY', 'STEAMY', 'HEATED',
+
+  // Emotions & States
+  'BLUSH', 'GIDDY', 'SILLY', 'GOOFY', 'CRAZY', 'LUCKY',
+  'MISSES', 'NEEDS', 'WANTS', 'ACHES', 'LONGS', 'WAITS',
+
+  // Time & Moments
+  'TODAY', 'LATER', 'EARLY', 'SLEEP', 'AWAKE', 'SNEAK',
+
+  // Common Valid Words (to make game playable)
+  'ABOUT', 'AFTER', 'AGAIN', 'ALONE', 'ALONG', 'ANGEL', 'ANGRY',
+  'APART', 'BEACH', 'BEGAN', 'BEING', 'BELOW', 'BLOOD', 'BOARD',
+  'BRAIN', 'BRAND', 'BREAD', 'BREAK', 'BRING', 'BROAD', 'BROKE',
+  'BROWN', 'BUILD', 'BUILT', 'CARRY', 'CATCH', 'CAUSE', 'CHAIR',
+  'CHEAP', 'CHECK', 'CHEST', 'CHIEF', 'CHILD', 'CHOSE', 'CLAIM',
+  'CLASS', 'CLEAN', 'CLEAR', 'CLIMB', 'CLOCK', 'CLOSE', 'CLOUD',
+  'COAST', 'COULD', 'COUNT', 'COURT', 'COVER', 'CRAFT', 'CRAZY',
+  'CREAM', 'CRIME', 'CROSS', 'CROWD', 'CROWN', 'DAILY', 'DEALT',
+  'DEATH', 'DOUBT', 'DOZEN', 'DRAFT', 'DRAMA', 'DRANK', 'DRAWN',
+  'DRESS', 'DRILL', 'DRINK', 'DRIVE', 'DROVE', 'DYING', 'EAGER',
+  'EARLY', 'EARTH', 'EIGHT', 'EMPTY', 'ENEMY', 'ENJOY', 'ENTER',
+  'ENTRY', 'EQUAL', 'ERROR', 'EVENT', 'EVERY', 'EXACT', 'EXIST',
+  'EXTRA', 'FAITH', 'FALSE', 'FAULT', 'FIBER', 'FIELD', 'FIFTH',
+  'FIFTY', 'FIGHT', 'FINAL', 'FIRST', 'FIXED', 'FLASH', 'FLEET',
+  'FLOOR', 'FLUID', 'FOCUS', 'FORCE', 'FORTH', 'FORTY', 'FORUM',
+  'FOUND', 'FRAME', 'FRANK', 'FRAUD', 'FRESH', 'FRONT', 'FRUIT',
+  'FULLY', 'FUNNY', 'GIANT', 'GIVEN', 'GLASS', 'GLOBE', 'GOING',
+  'GRACE', 'GRADE', 'GRAND', 'GRANT', 'GRASS', 'GRAVE', 'GREAT',
+  'GREEN', 'GROSS', 'GROUP', 'GROWN', 'GUARD', 'GUESS', 'GUEST',
+  'GUIDE', 'HAPPY', 'HARRY', 'HEART', 'HEAVY', 'HENCE', 'HORSE',
+  'HOTEL', 'HOUSE', 'HUMAN', 'IDEAL', 'IMAGE', 'INDEX', 'INNER',
+  'INPUT', 'ISSUE', 'JOINT', 'JONES', 'JUDGE', 'KNOWN', 'LABEL',
+  'LARGE', 'LASER', 'LATER', 'LAUGH', 'LAYER', 'LEARN', 'LEASE',
+  'LEAST', 'LEAVE', 'LEGAL', 'LEVEL', 'LEWIS', 'LIGHT', 'LIMIT',
+  'LINKS', 'LIVES', 'LOCAL', 'LOGIC', 'LOOSE', 'LOWER', 'LUCKY',
+  'LUNCH', 'LYING', 'MAGIC', 'MAJOR', 'MAKER', 'MARCH', 'MARIA',
+  'MATCH', 'MAYBE', 'MAYOR', 'MEANT', 'MEDIA', 'METAL', 'MIGHT',
+  'MINOR', 'MINUS', 'MIXED', 'MODEL', 'MONEY', 'MONTH', 'MORAL',
+  'MOTOR', 'MOUNT', 'MOUSE', 'MOUTH', 'MOVED', 'MOVIE', 'MUSIC',
+  'NEEDS', 'NEVER', 'NEWER', 'NIGHT', 'NOISE', 'NORTH', 'NOTED',
+  'NOVEL', 'NURSE', 'OCCUR', 'OCEAN', 'OFFER', 'OFTEN', 'ORDER',
+  'OTHER', 'OUGHT', 'OUTER', 'OWNED', 'OWNER', 'PANEL', 'PAPER',
+  'PARIS', 'PARTS', 'PARTY', 'PEACE', 'PETER', 'PHASE', 'PHONE',
+  'PHOTO', 'PIECE', 'PILOT', 'PITCH', 'PLACE', 'PLAIN', 'PLANE',
+  'PLANT', 'PLATE', 'POINT', 'POUND', 'POWER', 'PRESS', 'PRICE',
+  'PRIDE', 'PRIME', 'PRINT', 'PRIOR', 'PRIZE', 'PROOF', 'PROUD',
+  'PROVE', 'QUEEN', 'QUICK', 'QUIET', 'QUITE', 'RADIO', 'RAISE',
+  'RANGE', 'RAPID', 'RATIO', 'REACH', 'READY', 'REFER', 'RIGHT',
+  'RIVER', 'ROBIN', 'ROGER', 'ROMAN', 'ROUGH', 'ROUND', 'ROUTE',
+  'ROYAL', 'RURAL', 'SCALE', 'SCENE', 'SCOPE', 'SCORE', 'SENSE',
+  'SERVE', 'SEVEN', 'SHALL', 'SHAPE', 'SHARE', 'SHARP', 'SHEET',
+  'SHELF', 'SHELL', 'SHIFT', 'SHINE', 'SHIRT', 'SHOCK', 'SHOOT',
+  'SHORT', 'SHOWN', 'SIGHT', 'SINCE', 'SIXTH', 'SIXTY', 'SIZED',
+  'SKILL', 'SLEEP', 'SLIDE', 'SMALL', 'SMART', 'SMILE', 'SMITH',
+  'SMOKE', 'SOLID', 'SOLVE', 'SORRY', 'SOUND', 'SOUTH', 'SPACE',
+  'SPARE', 'SPEAK', 'SPEED', 'SPEND', 'SPENT', 'SPLIT', 'SPOKE',
+  'SPORT', 'STAFF', 'STAGE', 'STAKE', 'STAND', 'START', 'STATE',
+  'STEAM', 'STEEL', 'STICK', 'STILL', 'STOCK', 'STONE', 'STOOD',
+  'STORE', 'STORM', 'STORY', 'STRIP', 'STUCK', 'STUDY', 'STUFF',
+  'STYLE', 'SUGAR', 'SUITE', 'SUPER', 'SWEET', 'TABLE', 'TAKEN',
+  'TASTE', 'TAXES', 'TEACH', 'TENDS', 'TEXAS', 'THANK', 'THEFT',
+  'THEIR', 'THEME', 'THERE', 'THESE', 'THICK', 'THING', 'THINK',
+  'THIRD', 'THOSE', 'THREE', 'THREW', 'THROW', 'TIGHT', 'TIMES',
+  'TITLE', 'TODAY', 'TOPIC', 'TOTAL', 'TOUCH', 'TOUGH', 'TOWER',
+  'TRACK', 'TRADE', 'TRAIN', 'TREAT', 'TREND', 'TRIAL', 'TRIED',
+  'TRIES', 'TRUCK', 'TRULY', 'TRUST', 'TRUTH', 'TWICE', 'UNDER',
+  'UNDUE', 'UNION', 'UNITY', 'UNTIL', 'UPPER', 'URBAN', 'USAGE',
+  'USUAL', 'VALID', 'VALUE', 'VIDEO', 'VIRUS', 'VISIT', 'VITAL',
+  'VOCAL', 'VOICE', 'WASTE', 'WATCH', 'WATER', 'WHEEL', 'WHERE',
+  'WHICH', 'WHILE', 'WHITE', 'WHOLE', 'WHOSE', 'WOMAN', 'WOMEN',
+  'WORLD', 'WORRY', 'WORSE', 'WORST', 'WORTH', 'WOULD', 'WOUND',
+  'WRITE', 'WRONG', 'WROTE', 'YIELD', 'YOUNG', 'YOURS', 'YOUTH'
 ];
 
 module.exports = wordleWords;

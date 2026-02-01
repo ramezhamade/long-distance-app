@@ -232,6 +232,7 @@ app.get('/api/games/wordle/today', authenticate, (req, res) => {
   res.json({
     date: dateKey,
     word: word, // Send the word so frontend can validate
+    validWords: wordleWords, // Send valid words list for validation
     myResult: myResult || null,
     opponentResult: otherResult && otherResult.completed ? otherResult : null,
     winner: puzzle.winner || null
