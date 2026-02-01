@@ -6,7 +6,7 @@ const whoMoreLikelyQuestions = {
     "Who's more likely to send a spicy text first?",
     "Who's more likely to suggest trying something new?",
     "Who's more likely to get turned on by a simple touch?",
-    "Who's most likely to finish first?"
+    "Who's most likely to finish first?",
     "Who's more likely to wake you up for some action?",
     "Who's more likely to be louder in bed?",
     "Who's more likely to take charge?",
