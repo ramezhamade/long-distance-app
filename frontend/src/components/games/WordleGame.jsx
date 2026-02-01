@@ -7,9 +7,12 @@ function WordleGame({ getAuthHeaders }) {
   const [gameState, setGameState] = useState('loading');
   const [currentGuess, setCurrentGuess] = useState('');
   const [guesses, setGuesses] = useState([]);
+  const [evaluations, setEvaluations] = useState([]); // Store color feedback for each guess
+  const [targetWord, setTargetWord] = useState('');
   const [myResult, setMyResult] = useState(null);
   const [opponentResult, setOpponentResult] = useState(null);
   const [winner, setWinner] = useState(null);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     fetchTodaysPuzzle();
@@ -21,9 +24,16 @@ function WordleGame({ getAuthHeaders }) {
         headers: getAuthHeaders(),
       });
 
+      setTargetWord(response.data.word);
+
       if (response.data.myResult) {
         setMyResult(response.data.myResult);
         setGuesses(response.data.myResult.attempts || []);
+        // Recalculate evaluations for completed game
+        const evals = (response.data.myResult.attempts || []).map(guess =>
+          evaluateGuess(guess, response.data.word)
+        );
+        setEvaluations(evals);
         setGameState('completed');
       } else {
         setGameState('playing');
@@ -37,18 +47,64 @@ function WordleGame({ getAuthHeaders }) {
     }
   };
 
+  // Evaluate a guess and return color feedback for each letter
+  const evaluateGuess = (guess, word) => {
+    const result = Array(5).fill('absent'); // absent = gray
+    const wordLetters = word.split('');
+    const guessLetters = guess.split('');
+    const letterCounts = {};
+
+    // Count letters in the target word
+    wordLetters.forEach(letter => {
+      letterCounts[letter] = (letterCounts[letter] || 0) + 1;
+    });
+
+    // First pass: mark correct positions (green)
+    guessLetters.forEach((letter, i) => {
+      if (letter === wordLetters[i]) {
+        result[i] = 'correct'; // green
+        letterCounts[letter]--;
+      }
+    });
+
+    // Second pass: mark present but wrong position (yellow)
+    guessLetters.forEach((letter, i) => {
+      if (result[i] === 'absent' && letterCounts[letter] > 0) {
+        result[i] = 'present'; // yellow
+        letterCounts[letter]--;
+      }
+    });
+
+    return result;
+  };
+
   const handleSubmitGuess = async () => {
-    if (currentGuess.length !== 5) return;
+    if (currentGuess.length !== 5) {
+      setMessage('Word must be 5 letters');
+      return;
+    }
 
-    const newGuesses = [...guesses, currentGuess.toUpperCase()];
+    const upperGuess = currentGuess.toUpperCase();
+    const evaluation = evaluateGuess(upperGuess, targetWord);
+
+    const newGuesses = [...guesses, upperGuess];
+    const newEvaluations = [...evaluations, evaluation];
+
     setGuesses(newGuesses);
+    setEvaluations(newEvaluations);
     setCurrentGuess('');
+    setMessage('');
 
-    // Check if won or used all attempts
-    const won = false; // We don't validate the word on frontend
-    const completed = newGuesses.length >= 6;
+    const won = upperGuess === targetWord;
+    const isGameOver = won || newGuesses.length >= 6;
 
-    if (completed) {
+    if (won) {
+      setMessage('🎉 You won!');
+    } else if (newGuesses.length >= 6) {
+      setMessage(`Game Over! The word was ${targetWord}`);
+    }
+
+    if (isGameOver) {
       try {
         await axios.post(`${API_URL}/games/wordle/submit`, {
           guesses: newGuesses.length,
@@ -74,15 +130,17 @@ function WordleGame({ getAuthHeaders }) {
       handleSubmitGuess();
     } else if (e.key === 'Backspace') {
       setCurrentGuess(prev => prev.slice(0, -1));
+      setMessage('');
     } else if (/^[a-zA-Z]$/.test(e.key) && currentGuess.length < 5) {
       setCurrentGuess(prev => prev + e.key.toUpperCase());
+      setMessage('');
     }
   };
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentGuess, gameState]);
+  }, [currentGuess, gameState, guesses]);
 
   if (gameState === 'loading') {
     return <div className="game-loading">Loading puzzle...</div>;
@@ -94,17 +152,28 @@ function WordleGame({ getAuthHeaders }) {
 
   return (
     <div className="wordle-game">
-      <h2>Daily Wordle</h2>
+      <h2>🟩 Daily Wordle</h2>
       <p className="game-instructions">Guess the 5-letter word in 6 tries!</p>
 
+      {message && <div className="wordle-message">{message}</div>}
+
       <div className="wordle-board">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="wordle-row">
-            {[...Array(5)].map((_, j) => {
-              const guess = guesses[i];
-              const letter = guess ? guess[j] : (i === guesses.length ? currentGuess[j] : '');
+        {[...Array(6)].map((_, rowIndex) => (
+          <div key={rowIndex} className="wordle-row">
+            {[...Array(5)].map((_, colIndex) => {
+              const guess = guesses[rowIndex];
+              const evaluation = evaluations[rowIndex];
+              const isCurrentRow = rowIndex === guesses.length && gameState === 'playing';
+              const letter = guess
+                ? guess[colIndex]
+                : (isCurrentRow ? currentGuess[colIndex] : '');
+
+              const cellClass = guess && evaluation
+                ? `wordle-cell ${evaluation[colIndex]}`
+                : 'wordle-cell';
+
               return (
-                <div key={j} className="wordle-cell">
+                <div key={colIndex} className={cellClass}>
                   {letter || ''}
                 </div>
               );
@@ -132,12 +201,12 @@ function WordleGame({ getAuthHeaders }) {
       {gameState === 'completed' && myResult && (
         <div className="game-result">
           <h3>Your Result</h3>
-          <p>Completed in {myResult.guesses} guesses</p>
+          <p>{myResult.won ? '🎉 Won' : '😔 Lost'} in {myResult.guesses} guesses</p>
 
           {opponentResult ? (
             <div className="opponent-result">
               <h3>Opponent's Result</h3>
-              <p>Completed in {opponentResult.guesses} guesses</p>
+              <p>{opponentResult.won ? '🎉 Won' : '😔 Lost'} in {opponentResult.guesses} guesses</p>
 
               {winner && (
                 <div className={`winner-banner ${winner === 'tie' ? 'tie' : ''}`}>
