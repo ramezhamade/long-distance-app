@@ -355,17 +355,20 @@ function calculateWinnerFile(game, puzzleId, data) {
 // ============ WORDLE ENDPOINTS ============
 app.get('/api/games/wordle/today', authenticate, async (req, res) => {
   const playerName = getPlayerName(req);
+  console.log('[Wordle] /today called by:', playerName);
 
   if (USE_SUPABASE) {
     try {
-      let { data: state } = await supabase.from('wordle_state').select('*').eq('id', 1).single();
+      let { data: state, error: stateError } = await supabase.from('wordle_state').select('*').eq('id', 1).single();
+      console.log('[Wordle] State:', state, 'Error:', stateError);
       if (!state) {
         await supabase.from('wordle_state').insert([{ id: 1, current_puzzle_id: 0, used_word_indices: [] }]);
         state = { current_puzzle_id: 0, used_word_indices: [] };
       }
 
       const puzzleId = state.current_puzzle_id;
-      let { data: puzzle } = await supabase.from('wordle_puzzles').select('*').eq('puzzle_id', puzzleId).single();
+      let { data: puzzle, error: puzzleError } = await supabase.from('wordle_puzzles').select('*').eq('puzzle_id', puzzleId).single();
+      console.log('[Wordle] Puzzle ID:', puzzleId, 'Puzzle:', puzzle ? puzzle.word : 'NONE', 'Error:', puzzleError);
 
       if (puzzle) {
         const { data: results } = await supabase.from('wordle_results').select('*').eq('puzzle_id', puzzleId);
@@ -382,6 +385,7 @@ app.get('/api/games/wordle/today', authenticate, async (req, res) => {
       }
 
       // Create new puzzle
+      console.log('[Wordle] Creating new puzzle...');
       const usedIndices = state.used_word_indices || [];
       const availableIndices = [];
       for (let i = 0; i < wordleWords.length; i++) {
@@ -394,13 +398,20 @@ app.get('/api/games/wordle/today', authenticate, async (req, res) => {
 
       const randomIdx = availableIndices[Math.floor(Math.random() * availableIndices.length)];
       const word = wordleWords[randomIdx];
+      console.log('[Wordle] New puzzle:', { puzzleId, word, randomIdx });
 
-      await supabase.from('wordle_puzzles').insert([{ puzzle_id: puzzleId, word, word_index: randomIdx }]);
+      const { error: insertError } = await supabase.from('wordle_puzzles').insert([{ puzzle_id: puzzleId, word, word_index: randomIdx }]);
+      if (insertError) {
+        console.error('[Wordle] Insert error:', insertError);
+        throw insertError;
+      }
+
       await supabase.from('wordle_state').update({ used_word_indices: [...usedIndices, randomIdx] }).eq('id', 1);
 
+      console.log('[Wordle] Puzzle created successfully');
       res.json({ puzzleId, word, validWords: wordleWords, myResult: null, opponentResult: null, winner: null });
     } catch (error) {
-      console.error('Error in wordle/today:', error);
+      console.error('[Wordle] Error in /today:', error);
       res.status(500).json({ error: 'Failed to get wordle puzzle' });
     }
   } else {
