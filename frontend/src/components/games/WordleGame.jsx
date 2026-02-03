@@ -53,6 +53,9 @@ function WordleGame({ getAuthHeaders }) {
         setMessage(error.response.data.message);
         setGameState('no_more_puzzles');
       } else {
+        // Show detailed error in UI
+        const errorMsg = error.response?.data?.error || error.message || 'Network error';
+        setMessage(`${errorMsg} (Status: ${error.response?.status || 'N/A'})`);
         setGameState('error');
       }
     }
@@ -146,7 +149,13 @@ function WordleGame({ getAuthHeaders }) {
   }
 
   if (gameState === 'error') {
-    return <div className="game-error">Error loading puzzle. Please try again.</div>;
+    return (
+      <div className="game-error">
+        <p>Error loading puzzle. Please try again.</p>
+        <p style={{fontSize: '12px', color: '#666'}}>{message || 'Unknown error'}</p>
+        <button onClick={fetchTodaysPuzzle}>Retry</button>
+      </div>
+    );
   }
 
   if (gameState === 'no_more_puzzles') {
