@@ -996,6 +996,117 @@ app.get('/api/who-more-likely/history', authenticate, async (req, res) => {
   }
 });
 
+// ============ WAITING STATUS ENDPOINT ============
+app.get('/api/waiting-status', authenticate, async (req, res) => {
+  const playerName = getPlayerName(req);
+  const otherPlayer = playerName === 'Ramez' ? 'Layan' : 'Ramez';
+
+  const waitingOn = [];
+
+  if (USE_SUPABASE) {
+    try {
+      // Check Wordle
+      const { data: wordleState } = await supabase.from('wordle_state').select('current_puzzle_id').eq('id', 1).single();
+      if (wordleState) {
+        const { data: wordleResults } = await supabase.from('wordle_results').select('player_name').eq('puzzle_id', wordleState.current_puzzle_id);
+        const players = wordleResults?.map(r => r.player_name) || [];
+        if (players.includes(playerName) && !players.includes(otherPlayer)) {
+          waitingOn.push({ game: 'Wordle', waitingFor: otherPlayer, icon: '🟩' });
+        } else if (!players.includes(playerName) && players.includes(otherPlayer)) {
+          waitingOn.push({ game: 'Wordle', waitingFor: playerName, icon: '🟩', isYou: true });
+        }
+      }
+
+      // Check Connections
+      const { data: connState } = await supabase.from('connections_state').select('current_puzzle_id').eq('id', 1).single();
+      if (connState) {
+        const { data: connResults } = await supabase.from('connections_results').select('player_name').eq('puzzle_id', connState.current_puzzle_id);
+        const players = connResults?.map(r => r.player_name) || [];
+        if (players.includes(playerName) && !players.includes(otherPlayer)) {
+          waitingOn.push({ game: 'Connections', waitingFor: otherPlayer, icon: '🔗' });
+        } else if (!players.includes(playerName) && players.includes(otherPlayer)) {
+          waitingOn.push({ game: 'Connections', waitingFor: playerName, icon: '🔗', isYou: true });
+        }
+      }
+
+      // Check WML - get current question and see who has answered
+      const { data: usedQuestions } = await supabase.from('wml_used_questions').select('question_id');
+      const usedIds = usedQuestions?.map(u => u.question_id) || [];
+
+      // Get all questions not fully used
+      const { data: allQuestions } = await supabase.from('wml_questions').select('*');
+      const { data: allResponses } = await supabase.from('wml_responses').select('*');
+
+      // Find current question (first unused one, or one with only 1 response)
+      for (const q of (allQuestions || [])) {
+        if (usedIds.includes(q.id)) continue;
+
+        const qResponses = (allResponses || []).filter(r => r.question_id === q.id);
+        const respondedPlayers = qResponses.map(r => r.player_name);
+
+        if (respondedPlayers.length === 1) {
+          // One person answered, waiting on the other
+          const answeredBy = respondedPlayers[0];
+          const waitingFor = answeredBy === 'Ramez' ? 'Layan' : 'Ramez';
+          waitingOn.push({
+            game: "Who's More Likely",
+            waitingFor,
+            icon: '🤔',
+            isYou: waitingFor === playerName,
+            questionText: q.text
+          });
+          break;
+        } else if (respondedPlayers.length === 0) {
+          // No one answered yet - not waiting
+          break;
+        }
+      }
+
+      res.json({ waitingOn, playerName, otherPlayer });
+    } catch (error) {
+      console.error('Error fetching waiting status:', error);
+      res.status(500).json({ error: 'Failed to fetch waiting status' });
+    }
+  } else {
+    // File-based fallback
+    const data = readData();
+    initializeGameData(data);
+
+    // Check Wordle
+    const wordlePuzzleId = data.games.wordle.currentPuzzleId;
+    const wordleResults = data.games.wordle.results[wordlePuzzleId] || {};
+    if (wordleResults[playerName] && !wordleResults[otherPlayer]) {
+      waitingOn.push({ game: 'Wordle', waitingFor: otherPlayer, icon: '🟩' });
+    } else if (!wordleResults[playerName] && wordleResults[otherPlayer]) {
+      waitingOn.push({ game: 'Wordle', waitingFor: playerName, icon: '🟩', isYou: true });
+    }
+
+    // Check Connections
+    const connPuzzleId = data.games.connections.currentPuzzleId;
+    const connResults = data.games.connections.results[connPuzzleId] || {};
+    if (connResults[playerName] && !connResults[otherPlayer]) {
+      waitingOn.push({ game: 'Connections', waitingFor: otherPlayer, icon: '🔗' });
+    } else if (!connResults[playerName] && connResults[otherPlayer]) {
+      waitingOn.push({ game: 'Connections', waitingFor: playerName, icon: '🔗', isYou: true });
+    }
+
+    // Check WML
+    const wmlQuestions = data.whoMoreLikely?.questions || [];
+    for (const q of wmlQuestions) {
+      const responses = data.whoMoreLikely?.responses?.[q.id] || {};
+      if (responses['Ramez'] && !responses['Layan']) {
+        waitingOn.push({ game: "Who's More Likely", waitingFor: 'Layan', icon: '🤔', isYou: playerName === 'Layan', questionText: q.text });
+        break;
+      } else if (!responses['Ramez'] && responses['Layan']) {
+        waitingOn.push({ game: "Who's More Likely", waitingFor: 'Ramez', icon: '🤔', isYou: playerName === 'Ramez', questionText: q.text });
+        break;
+      }
+    }
+
+    res.json({ waitingOn, playerName, otherPlayer });
+  }
+});
+
 // ============ SCOREBOARD ENDPOINT ============
 app.get('/api/scoreboard', authenticate, async (req, res) => {
   if (USE_SUPABASE) {

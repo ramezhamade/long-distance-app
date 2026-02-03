@@ -8,6 +8,7 @@ import TabNavigation from './components/TabNavigation';
 import GamesHub from './components/games/GamesHub';
 import WhoMoreLikely from './components/whoMoreLikely/WhoMoreLikely';
 import Scoreboard from './components/scoreboard/Scoreboard';
+import WaitingStatus from './components/WaitingStatus';
 import './App.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
@@ -208,6 +209,7 @@ function App() {
       <div className="container">
         {activeTab === 'home' && (
           <>
+            <WaitingStatus getAuthHeaders={getAuthHeaders} />
             <Countdown event={nextEvent} />
             <Statistics statistics={statistics} onUpdateStatistics={updateStatistics} />
             <Calendar events={events} onAddEvent={addEvent} onDeleteEvent={deleteEvent} />
