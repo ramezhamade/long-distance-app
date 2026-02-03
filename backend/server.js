@@ -461,10 +461,13 @@ app.post('/api/games/wordle/submit', authenticate, async (req, res) => {
   const playerName = getPlayerName(req);
   const { guesses, won, attempts } = req.body;
 
+  console.log(`[Wordle Submit] Player: ${playerName}, guesses: ${guesses}, won: ${won}`);
+
   if (USE_SUPABASE) {
     try {
       const { data: state } = await supabase.from('wordle_state').select('current_puzzle_id').eq('id', 1).single();
       const puzzleId = state.current_puzzle_id;
+      console.log(`[Wordle Submit] Current puzzle ID: ${puzzleId}`);
 
       const { data: puzzle } = await supabase.from('wordle_puzzles').select('*').eq('puzzle_id', puzzleId).single();
       if (!puzzle) return res.status(400).json({ error: 'No active puzzle' });
@@ -474,13 +477,16 @@ app.post('/api/games/wordle/submit', authenticate, async (req, res) => {
         { onConflict: 'puzzle_id,player_name' }
       );
       if (upsertError) {
-        console.error('Error upserting wordle result:', upsertError);
+        console.error('[Wordle Submit] Error upserting wordle result:', upsertError);
         throw upsertError;
       }
+      console.log(`[Wordle Submit] Result saved for ${playerName}`);
 
       const { data: results } = await supabase.from('wordle_results').select('*').eq('puzzle_id', puzzleId);
+      console.log(`[Wordle Submit] Total results for puzzle ${puzzleId}: ${results.length}`, results.map(r => r.player_name));
 
       if (results.length === 2) {
+        console.log('[Wordle Submit] Both players done! Calculating winner and advancing puzzle...');
         const [r1, r2] = results;
         let winner = null;
         if (r1.won && !r2.won) winner = r1.player_name;
@@ -501,6 +507,9 @@ app.post('/api/games/wordle/submit', authenticate, async (req, res) => {
         }
 
         await supabase.from('wordle_state').update({ current_puzzle_id: puzzleId + 1 }).eq('id', 1);
+        console.log(`[Wordle Submit] Puzzle advanced to ${puzzleId + 1}`);
+      } else {
+        console.log(`[Wordle Submit] Waiting for other player (${results.length}/2 results)`);
       }
 
       res.json({ success: true });
