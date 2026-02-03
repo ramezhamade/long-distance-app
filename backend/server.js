@@ -376,10 +376,20 @@ app.get('/api/games/wordle/today', authenticate, async (req, res) => {
         const otherPlayer = playerName === 'Ramez' ? 'Layan' : 'Ramez';
         const otherResult = results?.find(r => r.player_name === otherPlayer);
 
+        // Helper to ensure attempts is always an array (Supabase may return it as string)
+        const parseAttempts = (attempts) => {
+          if (!attempts) return [];
+          if (Array.isArray(attempts)) return attempts;
+          if (typeof attempts === 'string') {
+            try { return JSON.parse(attempts); } catch { return []; }
+          }
+          return [];
+        };
+
         return res.json({
           puzzleId, word: puzzle.word, validWords: wordleWords,
-          myResult: myResult ? { guesses: myResult.guesses, won: myResult.won, attempts: myResult.attempts, completed: myResult.completed, timestamp: myResult.timestamp } : null,
-          opponentResult: otherResult?.timestamp ? { guesses: otherResult.guesses, won: otherResult.won, attempts: otherResult.attempts, completed: otherResult.completed, timestamp: otherResult.timestamp } : null,
+          myResult: myResult ? { guesses: myResult.guesses, won: myResult.won, attempts: parseAttempts(myResult.attempts), completed: myResult.completed, timestamp: myResult.timestamp } : null,
+          opponentResult: otherResult?.timestamp ? { guesses: otherResult.guesses, won: otherResult.won, attempts: parseAttempts(otherResult.attempts), completed: otherResult.completed, timestamp: otherResult.timestamp } : null,
           winner: puzzle.winner
         });
       }
