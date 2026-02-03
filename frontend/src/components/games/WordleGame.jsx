@@ -40,6 +40,12 @@ function WordleGame({ getAuthHeaders }) {
         setEvaluations(evals);
         setGameState('completed');
       } else {
+        // Reset all game state for new puzzle
+        setMyResult(null);
+        setGuesses([]);
+        setEvaluations([]);
+        setCurrentGuess('');
+        setMessage('');
         setGameState('playing');
       }
 
