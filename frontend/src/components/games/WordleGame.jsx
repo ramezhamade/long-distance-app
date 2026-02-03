@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+console.log('[Wordle] API_URL configured as:', API_URL);
 
 function WordleGame({ getAuthHeaders }) {
   const [gameState, setGameState] = useState('loading');
@@ -20,10 +21,12 @@ function WordleGame({ getAuthHeaders }) {
   }, []);
 
   const fetchTodaysPuzzle = async () => {
+    console.log('[Wordle Frontend] Fetching from:', `${API_URL}/games/wordle/today`);
     try {
       const response = await axios.get(`${API_URL}/games/wordle/today`, {
         headers: getAuthHeaders(),
       });
+      console.log('[Wordle Frontend] Response:', response.data);
 
       setTargetWord(response.data.word);
       setValidWords(response.data.validWords || []);
@@ -43,7 +46,9 @@ function WordleGame({ getAuthHeaders }) {
       setOpponentResult(response.data.opponentResult);
       setWinner(response.data.winner);
     } catch (error) {
-      console.error('Error fetching puzzle:', error);
+      console.error('[Wordle Frontend] Error fetching puzzle:', error);
+      console.error('[Wordle Frontend] Error response:', error.response);
+      console.error('[Wordle Frontend] Error message:', error.message);
       if (error.response?.status === 400 && error.response?.data?.message) {
         setMessage(error.response.data.message);
         setGameState('no_more_puzzles');
